@@ -1,0 +1,90 @@
+TITLE:
+WAVE_NFCENS_v1.2.0 - Combined EMC(GEFSv12.0)-FNMOC wave statistics.
+
+SUMMARY:
+- wave_nfcensv1.2.0 reads and processes the  wave files for every forecast
+   time output for 21 members coming from GEFSv12 and 20 members 
+  coming from FNMOC-waves.
+- Interpolates both wave datasets from GEFSv12  (0.25x0.25 deg) and 
+  from FNMOC (0.5x0.5 deg) to 1x1 deg resolution.
+-Produces files in nawips format using gempak 
+
+CHANGE REQUEST CLASS:
+
+NEW FEATURE:
+-Interpolating the input 0.25 deg GEFSv12 input and 0.5 deg FNMOC input
+ to 1 deg output.
+-Added WMO05 tables, needed for FNMOC wave data.
+
+STRUCTURE AND RESOURCE DESCRIPTION
+-Due to the higher resolution wave data from both sources (EMC and FNMOC)
+  the computational time has been increased from 13 min to 23 min wallclock time.
+-The final output from this system remains the same as the final  products of the
+  system in operations.
+
+CHANGES TO SCRIPTS AND CODES:
+-In scripts/exwave_nfcens.sh
+  Added lines to interpolate FNMOC-waves data from 0.5x0.5 deg to 1x1 deg.
+  Changed lines to interpolate EMC-wave data from 0.25x0.25 deg to 1x1 deg.
+-Added two tables gempak/fix/g2varswmo5.tbl and gempak/fix/g2vcrdwmo5.tbl
+  (FNMOC fields need updated WMO5 header tables)
+
+UPSTREAM DEPENDENCIES:
+- GEFSV12.0
+- FNMOC, data at 
+    /gpfs/dell1/nco/ops/dcom/prod/20200518/wgrbbul/fnmoc_ocn_ens_0p5_gb2
+
+DISSEMINATION INFO
+N/A
+
+BUGFIXES:
+
+BENEFIT OF CHANGE:
+- Allows the  use of higher resolution input, from both upstream data sources
+  (EMC and  FNMOC) which will provide  products with higher quality. 
+- Allows the use of the GEFSv12 output, separated files for every forecast time.
+- It keeps the same output data volume
+
+USER IMPACT STATEMENT:
+-Despite the changes in geographical resolution on both databases (EMC and FNMOC)
+  the size of the final products remains the same as they keep the same resolution as 
+  in  operations, however the quality of the final product have been enhanced by the 
+ increase in resolution on both databases.  
+
+TECHNICAL IMPACT STATEMENT:
+N/A
+
+RISKS:
+N/A
+
+UPDATES:
+
+TESTING:
+Dev testing completed.
+
+RISKS:
+N/A
+
+TECHNICAL DETAILS OF REQUIRED SYSTEM USAGE:
+ All the items are exactly  the same as in the system in operations, except the RUNTIME,
+ As the new NFCENS version uses higher resolution input data and it needs more
+ to interpolate those data to a 1x1 deg wave fields. 
+- Runtime: 23 min
+- Consumable Memory: mem=2500
+- Disk Storage: 623 M
+- Node: 1
+- Serial
+- Shared job
+
+IMPLEMENTATION INSTRUCTIONS
+-To build the executable needed for this system, run sorc/build_nfcens.sh, 
+  this will create exec/nfcombwave_ensemble
+
+PROPOSED IMPLEMENTATION
+DATE:
+TIME:
+
+
+
+
+

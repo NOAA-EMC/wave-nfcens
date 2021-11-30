@@ -1,0 +1,348 @@
+$
+$ Global output point data file for multi-grid wave model
+$
+$ Key to data in file:
+$
+$   LON      Longitude, east positive
+$   LAT      Latitude
+$   NAME     Output point name C*10, no blanks in name allowed
+$   AH       Anemometer height, dummy value for none-data points
+$   TYPE     Buoy type indicator, used for plotting and postprocessing
+$             DAT      Data point
+$             XDT      Former data point
+$             BPT      Boundary data for external models.
+$             VBY      'Virtual buoy'
+$   SOURCE   Source of data point
+$             ENCAN    Environment Canada
+$             GOMOOS   Gulf of Maine OOS
+$             IDT      Irish Department of Transportation
+$             METFR    Meteo France
+$             NCEP     Boundary and other data points
+$             NDBC     National Data Buoy Center
+$             PRIV     Private and incidental data sources
+$             SCRIPPS  Scripps
+$             UKMO     UK Met Office
+$             PDES     Puertos del Estados
+$             SHOM     Service Hydrographique et Oceanographique de la Marine
+$             OCNOR    Fugro Oceanor
+$             WHOI     Woods Hole Oceanographic Institute
+$	      SKOREA   South Korea
+$             MVEW     Ministerie van Verkeer en Waterstaat
+$   SCALE    Scale indicator for plotting of locations on map
+$            Point will only be plotted if SCALE =< DX in our
+$            GrADS scripts, DX is width of plot in logitude
+$
+$ Notes:
+$
+$  - The '$' at the first position identifies comments for WAVEWATCH III
+$    input.
+$  - The first three data columns are used by the forecats code, the other
+$    are used by postprocessing scripts.
+$
+$ NE Pacific deep ocean 
+$
+$   LON     LAT     NAME          AH   TYPE  SOURCE  SCALE
+$ ---------------------------------------------------------
+  -148.02   56.31  '46001     '   5.0   DAT  NDBC     360
+  -130.27   42.60  '46002     '   5.0   DAT  NDBC     360
+  -136.10   50.93  '46004     '   5.0   DAT  ENCAN    360
+  -131.02   46.05  '46005     '   5.0   DAT  NDBC     360
+  -137.48   40.80  '46006     '   5.0   DAT  NDBC     360
+  -177.58   57.05  '46035     '  10.0   DAT  NDBC     360
+  -133.94   48.35  '46036     '   5.0   DAT  ENCAN    360
+  -130.00   37.98  '46059     '   5.0   DAT  NDBC     360
+  -154.98   52.70  '46066     '   5.0   DAT  NDBC     360
+   175.28   55.00  '46070     '   5.0   DAT  NDBC     360
+  -172.03   54.94  '46073     '  10.0   DAT  NDBC     360
+  -138.85   53.91  '46184     '   5.0   DAT  ENCAN    360
+$
+$ NE Pacific coastal
+$
+$   LON     LAT     NAME          AH   TYPE  SOURCE  SCALE
+$ ---------------------------------------------------------
+$ Alaska
+$
+   179.05   51.16  '46071     '   5.0   DAT  NDBC     360
+  -171.73   52.25  '46072     '   5.0   DAT  NDBC     360
+  -160.81   53.93  '46075     '   5.0   DAT  NDBC     360
+  -152.45   56.05  '46078     '   5.0   DAT  NDBC     360
+  -150.00   58.00  '46080     '   5.0   DAT  NDBC     360
+  -142.56   56.85  '46085     '   5.0   DAT  NDBC     360
+$
+$ Canada
+$
+  -131.22   51.83  '46147     '   5.0   DAT  ENCAN     90
+  -134.28   54.16  '46205     '   5.0   DAT  ENCAN     45
+$
+$ USA
+$
+  -119.53   32.43  '46047     '   5.0   DAT  NDBC      45
+  -120.20   33.65  '46069     '   5.0   DAT  NDBC      45
+  -125.77   45.88  '46089     '   5.0   DAT  NDBC      45
+$
+$ Japanese buoys
+$
+$   LON     LAT     NAME          AH   TYPE  SOURCE  SCALE
+$ ---------------------------------------------------------
+   134.90   28.90  '21004     '   999.  XDT  JAPAN    360
+   126.30   28.10  '22001     '   999.  XDT  JAPAN    360
+$
+$ South Korean buoys
+$
+$   LON     LAT     NAME          AH   TYPE  SOURCE  SCALE
+$ ---------------------------------------------------------
+   125.77   34.80  '22102     '   999.  DAT  SKOREA    100
+$
+$ Hawaii
+$
+$   LON     LAT     NAME          AH   TYPE  SOURCE  SCALE
+$ ---------------------------------------------------------
+  -162.21   23.43  '51001     '   5.0   DAT  NDBC     360
+  -157.78   17.19  '51002     '   5.0   DAT  NDBC     360
+  -160.82   19.22  '51003     '   5.0   DAT  NDBC     360
+  -152.48   17.52  '51004     '   5.0   DAT  NDBC     360
+  -158.12   21.67  '51201     '  999.   DAT  SCRIPPS   11
+  -157.68   21.42  '51202     '  999.   DAT  SCRIPPS   11
+$
+$ Other deep Pacific
+$
+$   LON     LAT     NAME          AH   TYPE  SOURCE  SCALE
+$ ---------------------------------------------------------
+  -153.87    0.02  '51028     '   5.0   DAT  NDBC     360
+   144.79   13.54  '52200     '  999.   DAT  SCRIPPS  360
+$
+$ Gulf of Mexico and Carabean
+$
+$   LON     LAT     NAME          AH   TYPE  SOURCE  SCALE
+$ ---------------------------------------------------------
+   -89.67   25.90  '42001     '  10.0   DAT  NDBC     360
+   -94.42   25.17  '42002     '  10.0   DAT  NDBC     360
+   -85.94   26.07  '42003     '  10.0   DAT  NDBC     360
+   -95.36   27.91  '42019     '   5.0   DAT  NDBC      90
+   -96.70   26.94  '42020     '   5.0   DAT  NDBC      90
+   -84.52   28.50  '42036     '   5.0   DAT  NDBC      90
+   -92.55   27.42  '42038     '   5.0   DAT  NDBC      90
+   -86.02   28.79  '42039     '   5.0   DAT  NDBC      90
+   -88.21   29.18  '42040     '   5.0   DAT  NDBC      90
+   -90.46   27.50  '42041     '   5.0   DAT  NDBC      90
+$
+   -87.73   26.00  '42054     '  10.0   XDT  NDBC     360
+   -94.05   22.01  '42055     '  10.0   DAT  NDBC     360
+   -85.06   19.87  '42056     '  10.0   DAT  NDBC     360
+   -81.50   16.83  '42057     '  10.0   DAT  NDBC     360
+   -75.06   15.09  '42058     '  10.0   DAT  NDBC     360
+   -81.95   24.39  '42080     ' 999.    DAT  NDBC      45
+   -84.24   27.34  '42099     ' 999.    DAT  SCRIPPS  100 
+$
+   -67.50   15.01  '42059     '   5.0   DAT  NDBC     360
+$
+   -53.08   14.55  '41040     '   5.0   DAT  NDBC     360
+   -46.00   14.53  '41041     '   5.0   DAT  NDBC     360
+   -57.90   15.90  '41100     '   5.0   DAT  METFR    360
+   -56.20   14.60  '41101     '   5.0   DAT  METFR    360
+$
+$ NW Atlantic deep ocean
+$
+$   LON     LAT     NAME          AH   TYPE  SOURCE  SCALE
+$ ---------------------------------------------------------
+   -72.66   34.68  '41001     '   5.0   DAT  NDBC     360
+   -75.36   32.32  '41002     '   5.0   DAT  NDBC     360
+   -66.58   41.11  '44011     '   5.0   DAT  NDBC     360
+   -62.00   42.26  '44137     '   5.0   DAT  ENCAN    360
+   -53.62   44.26  '44138     '   5.0   DAT  ENCAN    360
+   -57.08   44.26  '44139     '   5.0   DAT  ENCAN    360
+   -51.74   43.75  '44140     '   5.0   DAT  ENCAN    360
+   -58.00   43.00  '44141     '   5.0   DAT  ENCAN    360
+   -64.01   42.50  '44150     '   5.0   DAT  ENCAN    360
+   -48.01   46.77  'WRB07     '  10.0   DAT  PRIV     360
+$
+$ NW Atlantic coastal
+$
+$   LON     LAT     NAME          AH   TYPE  SOURCE  SCALE
+$ ---------------------------------------------------------
+   -78.47   28.95  '41010     '   5.0   DAT  NDBC      80
+   -80.60   30.00  '41012     '   5.0   DAT  NDBC      80
+   -77.74   33.44  '41013     '   5.0   DAT  NDBC      80
+   -75.40   35.01  '41025     '   5.0   DAT  NDBC      80
+   -65.01   20.99  '41043     '   5.0   DAT  NDBC      90
+   -70.99   24.00  '41046     '   5.0   DAT  NDBC      90
+   -71.49   27.47  '41047     '  10.0   DAT  NDBC      90
+   -69.65   31.98  '41048     '  10.0   DAT  NDBC      90
+$
+   -70.43   38.48  '44004     '   5.0   DAT  NDBC      90
+   -69.16   43.19  '44005     '   5.0   DAT  NDBC      90
+   -69.43   40.50  '44008     '   5.0   DAT  NDBC      90
+   -74.84   36.61  '44014     '   5.0   DAT  NDBC      90
+   -72.10   40.70  '44017     '   5.0   DAT  NDBC      80
+   -69.29   41.26  '44018     '   5.0   DAT  NDBC      80
+   -65.93   42.31  '44024     '   4.0   DAT  GOMOOS    80
+   -67.88   43.49  '44037     '   4.0   DAT  GOMOOS    80
+$
+   -53.39   46.44  '44251     '   5.0   DAT  ENCAN     80
+   -57.35   47.28  '44255     '   5.0   DAT  ENCAN     80
+$
+$ NE Atlantic
+$
+$   LON     LAT     NAME          AH   TYPE  SOURCE  SCALE
+$ ---------------------------------------------------------
+$
+    -5.00   45.20  '62001     '   3.0   DAT  UKMO     360
+   -20.00   41.60  '62002     '  999.   DAT  UNKNOWN  360
+   -12.40   48.70  '62029     '   3.0   DAT  UKMO     360
+    -5.60   48.50  '62052     '  999.   DAT  METFR    100
+$    -1.45   44.65  '62064     '  999.   DAT  SHOM     100
+   -13.30   51.00  '62081     '   3.0   DAT  UKMO     360
+   -11.20   53.13  '62090     '   4.5   DAT  IDT      100
+   -10.55   51.22  '62092     '   4.5   DAT  IDT      100
+    -6.70   51.69  '62094     '   4.5   DAT  IDT       60
+   -15.92   53.06  '62095     '   4.5   DAT  IDT      100
+    -2.90   49.90  '62103     '  14.0   DAT  UKMO     360
+   -12.36   54.54  '62105     '   3.0   DAT  UKMO     360
+    -9.90   57.00  '62106     '   4.5   DAT  UKMO     360
+    -6.10   50.10  '62107     '  14.0   DAT  UKMO     360
+   -19.50   53.50  '62108     '   3.0   DAT  UKMO     360
+    -8.50   47.50  '62163     '   3.0   DAT  UKMO     360
+    -5.10   51.60  '62303     '   3.0   DAT  UKMO      25
+   -11.40   59.10  '64045     '   3.0   DAT  UKMO     360
+    -4.50   60.70  '64046     '   3.0   DAT  UKMO     360
+$
+$ Iceland
+$
+   -23.10   64.05  'TFGSK     '  999.   DAT  UNKNOWN   60
+   -25.00   65.69  'TFBLK     '  999.   DAT  UNKNOWN   60
+$  -23.36   66.44  'TFSTD     '  999.   DAT  UNKNOWN   60
+$  -21.12   65.76  'TFDRN     '  999.   DAT  UNKNOWN   60
+$  -22.46   63.82  'TFGRV     '  999.   DAT  UNKNOWN   60
+$
+$ Norwegian Sea
+$
+     7.80   64.30  'LF3F      '  999.   DAT  UNKNOWN  360
+     7.30   65.30  'LF3N      '  999.   DAT  UNKNOWN   60
+     8.10   66.00  'LF5T      '  999.   DAT  UNKNOWN  360
+     2.00   66.00  'LDWR      '  999.   DAT  UNKNOWN  360
+$
+$ North Sea
+$
+     1.10   55.30  '62026     '  999.   DAT  UNKNOWN  360
+     0.00   57.00  '62109     '  999.   DAT  UNKNOWN   25
+     1.30   58.70  '62112     '  999.   DAT  UNKNOWN   25
+     0.00   57.90  '62117     '  999.   DAT  UNKNOWN   15
+     2.00   57.00  '62119     '  999.   DAT  UNKNOWN   25
+     2.00   56.40  '62132     '  999.   DAT  UNKNOWN   25
+     1.70   53.40  '62144     '  999.   DAT  PRIV      45
+     2.80   53.10  '62145     '  999.   DAT  PRIV     360
+     0.50   57.40  '62162     '  999.   DAT  UNKNOWN   25
+     1.10   61.20  '63103     '  999.   DAT  UNKNOWN   15
+     1.70   60.80  '63108     '  999.   DAT  UNKNOWN   15
+     1.50   59.50  '63110     '  999.   DAT  PRIV      15
+     1.50   59.50  '63111     '  10.0   XDT  PRIV       0
+     1.30   61.60  '63115     '  999.   DAT  PRIV      25
+$
+     2.30   61.20  'LF3J      '  999.   DAT  UNKNOWN   25
+     3.70   60.60  'LF4B      '  999.   DAT  UNKNOWN  360
+     2.20   59.60  'LF4H      '  999.   DAT  UNKNOWN   25
+     1.90   58.40  'LF4C      '  999.   DAT  UNKNOWN   25
+     3.20   56.50  'LF5U      '  999.   DAT  UNKNOWN   60
+$
+$ Dutch Stations
+$
+$   LON     LAT     NAME          AH   TYPE  SOURCE  SCALE
+$ ---------------------------------------------------------
+     3.22   53.22  'K13       '  999.   DAT  MVEW      25
+$
+$ Barents Sea
+$
+    21.10   71.60  '3FYT      '  999.   DAT  UNKNOWN  360
+    15.50   73.50  'LFB1      '  999.   DAT  OCNOR    360
+    30.00   74.00  'LFB2      '  999.   DAT  OCNOR    360
+$
+$ Brazil
+$
+$   LON     LAT     NAME          AH   TYPE  SOURCE  SCALE
+$ ---------------------------------------------------------
+   -48.13  -27.70  '31201     '  999.   DAT  SCRIPPS  180
+$
+$ Peru/Chile Basin 
+$
+$   LON     LAT     NAME          AH   TYPE  SOURCE  SCALE
+$ ---------------------------------------------------------
+   -85.38  -19.62  '32012'       999.   DAT  WHOI     360
+$
+$ South Africa
+$
+$   LON     LAT     NAME          AH   TYPE  SOURCE  SCALE
+$ ---------------------------------------------------------
+    22.17  -34.97  'AGULHAS_FA'  10.0   DAT  PRIV     360
+$
+$ Australia
+$
+$   LON     LAT     NAME          AH   TYPE  SOURCE  SCALE
+$ ---------------------------------------------------------
+$  141.75  -12.68  '52121     '  999.   DAT  UNKNOWN   50
+$  150.34  -35.71  '55014     '  999.   DAT  UNKNOWN   50
+$  153.73  -28.69  '55017     '  999.   DAT  UNKNOWN   10
+$  153.27  -30.35  '55018     '  999.   DAT  UNKNOWN   10
+$  152.86  -31.83  '55019     '  999.   DAT  UNKNOWN   50
+$  151.03  -34.48  '55022     '  999.   DAT  UNKNOWN   50
+$  151.42  -33.77  '55024     '  999.   DAT  UNKNOWN   50
+$  151.32  -33.90  '55025     '  999.   DAT  UNKNOWN   10
+$  145.01  -42.08  '55026     '  999.   DAT  UNKNOWN   50
+$  145.71  -16.73  '55028     '  999.   DAT  UNKNOWN   50
+$  147.06  -19.16  '55029     '  999.   DAT  UNKNOWN   50
+$  149.55  -21.04  '55031     '  999.   DAT  UNKNOWN   50
+$  149.31  -21.27  '55032     '  999.   DAT  UNKNOWN   15
+$  153.20  -27.25  '55034     '  999.   DAT  UNKNOWN   10
+$  153.44  -27.96  '55036     '  999.   DAT  UNKNOWN   10
+$  153.58  -28.18  '55037     '  999.   DAT  UNKNOWN   10
+   148.19  -38.60  '55039     '  999.   DAT  UNKNOWN   50
+$  136.62  -36.07  '55040     '  999.   DAT  UNKNOWN   50
+   116.14  -19.59  '56002     '  999.   DAT  UNKNOWN  120
+$  114.91  -30.29  '56004     '  999.   DAT  UNKNOWN   50
+   114.78  -33.36  '56006     '  999.   DAT  UNKNOWN  120
+$  115.69  -31.98  '56008     '  999.   DAT  UNKNOWN   25
+$
+$ India
+$
+$   LON     LAT     NAME          AH   TYPE  SOURCE  SCALE
+$ ---------------------------------------------------------
+    72.49   17.02  '23092     '  999.   DAT  UNKNOWN   20
+    69.24   15.47  '23097     '  999.   DAT  UNKNOWN  360
+    90.74   12.14  '23099     '  999.   DAT  UNKNOWN  360
+    83.27   13.97  '23101     '  999.   DAT  UNKNOWN  360
+    87.50   15.00  '23168     '  999.   DAT  UNKNOWN  360
+    90.14   18.13  '23169     '  999.   DAT  UNKNOWN  360
+    72.66    8.33  '23170     '  999.   DAT  UNKNOWN  360
+    72.00   12.50  '23172     '  999.   DAT  UNKNOWN  360
+$
+$ Spain
+$
+$   LON     LAT     NAME          AH   TYPE  SOURCE  SCALE
+$ ---------------------------------------------------------
+    -3.03   43.63  '62024     '  999.   DAT  PDES      25
+$    -6.17   43.73  '62025     '  999.   DAT  PDES      25
+    -7.62   44.07  '62082     '  999.   DAT  PDES      25
+$    -9.22   43.48  '62083     '  999.   DAT  PDES      25
+    -9.40   42.12  '62084     '  999.   DAT  PDES      25
+    -6.97   36.48  '62085     '  999.   DAT  PDES      25
+$
+$ Mediteranean Sea
+$
+$     3.65   41.92  '61196     '  999.   DAT  PDES      25
+$     4.42   39.72  '61197     '  999.   DAT  PDES      25
+$    -2.33   36.57  '61198     '  999.   DAT  PDES      25
+$    -5.03   36.23  '61199     '  999.   DAT  PDES      25
+$     1.47   40.77  '61280     '  999.   DAT  PDES      25
+$     0.21   39.52  '61281     '  999.   DAT  PDES      25
+$    -0.32   37.65  '61417     '  999.   DAT  PDES      25
+$     2.10   39.55  '61430     '  999.   DAT  PDES      25
+$     7.80   43.40  '61001     '  999.   DAT  METFR     25
+$     4.70   42.10  '61002     '  999.   DAT  METFR     25
+$
+$ Canary Islands
+$
+   -15.82   28.18  '13130     '  999.   DAT  PDES      25
+   -16.58   28.00  '13131     '  999.   DAT  PDES      25
+$
+$ End of list
+$
+     0.00    0.00  'STOPSTRING'  999.   XXX  NCEP       0

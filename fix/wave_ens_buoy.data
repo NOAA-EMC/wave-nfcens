@@ -1,0 +1,122 @@
+  41001    6N07  D E HATTERAS      347 727   5.0 1
+  41002    6N29  G S HATTERAS      323 752   5.0 1
+c 41004    3D29  D EDISTO          325 791   5.0 2
+c 41008    3d36  v GRAY REEF       314 809   5.0 2
+c 41009   6nD11  D CANAVERAL       285 802   5.0 2
+  41010    6N28  D CANAVERAL EAST  289 785   5.0 1
+  41100          French West Ind.  159 579       1
+  42001   10D07  D MID GULF        259 897  10.0 1
+  42002    10D9  D W GULF          259 936  10.0 1
+  42003   10D10  D E GULF          259 859  10.0 1
+c 42007    D025  V OTP             301 888   5.0 0
+c 42019    3D32  V LANELLE         279 950   5.0 2
+c 42020    3d45  corpus christi    269 967   5.0 2
+c 42035    3D32  V GALVESTON       292 944   5.0 0
+c 42036    3D29  W. TAMPA          285 845   5.0 1
+c 42039    3d20  /d pensacola s.   288 860   5.0 1
+c 42040    3d30  /d mobile south   292 883   5.0 2
+c 42041    NDBC                    272 904   5.0 1
+c 42042    NDBC                    299 883   5.0 2
+c 42054    NDBC                    260 878   8.5 1
+  44004    6N19  D HOTEL           385 705   5.0 1
+c 44005    6N02  D GULF OF ME      427 686   5.0 2
+c 44007    3D31  D PORTLAND        435 701   5.0 0
+  44008    3D10  D NANTUCKET       405 694   5.0 1
+c 44009    3D49  D DELAWARE BAY    385 747   5.0 2
+  44011    6N16  D GEORGES BANK    411 666   5.0 1
+c 44013   3D211  D BOSTON          424 708   5.0 0
+c 44014    3D31  D VIRGINIA BEACH  366 748   5.0 2
+c 44025    3D21  D LONG ISLAND     403 732   5.0 2
+c 45001    3D27  D MID SUPERIOR    480 877   5.0 0
+c 45002    3D37  G N MICHIGAN      453 864   5.0 0
+c 45003    3D14  G N HURON         453 827   5.0 0
+c 45004    3D38  G E SUPERIOR      475 865   5.0 0
+c 45005    3D33  D W ERIE          417 824   5.0 0
+c 45006    6D10  D W SUPERIOR      473 899   5.0 0
+c 45007    3D35  D S MICHIGAN      427 871   5.0 0
+c 45008    6N15  G S HURON         443 824   5.0 0
+c 45010   2.4D1  D MILWAUKEE       440 878   3.0 0
+  46001    6N21  D GULF OF AK      5631483   5.0 1
+  46002    6N13  D OREGON          4251304   5.0 1
+c 46003    6N25  D S ALEUTIANS     5191559   5.0 1
+  46004          Canada West Coa*  5091361   5.0 1 
+  46005    6N11  D WASHINGTON      4611310   5.0 1
+  46006    6n28  d se papa         4081375   5.0 1
+c 46011    3D06  G SANTA MARIA     3491209   5.0 0
+c 46013    3d09  pt arena          3821233   5.0 2
+c 46012    3D18  G SANTA CRUZ      3741227   5.0 2 
+c 46014    3D08  G PT ARENA        3921240   5.0 2
+c 46022    3D24  G EEL RIVER       4081245   5.0 0
+c 46023   10d04  pt arguello       3471210  10.0 2
+c 46025    3D15  G CATALINA RDG    3371191   5.0 2
+c 46026    3D39  D SAN FRANCISCO   3771227   5.0 2
+c 46027    3d53  /v st. georges    4191244   5.0 0
+c 46028    3D23  G C SAN MARTIN    3581219   5.0 2
+c 46029    6N04  G COL RIVER BAR   4621242   5.0 0
+c 46030    3D02  D BLUNTS REEF     4041245   5.0 0
+  46035    12D2  D BERING SEA      5701777  10.0 1
+  46036          Canada West Coa*  4841339   5.0 1
+c 46041    3D10  D C ELIZABETH     4741245   5.0 2
+c 46042    3D26  D MONTEREY        3681224   5.0 2
+c 46045    3D16  D REDONDO BEACH   3381184   5.0 0
+c 46047    NDBC                    3241195   5.0 1
+c 46050    3D36  D STONEWALL BNK   4461245   5.0 2
+c 46053    3d41  /v santa barb e   3421198   5.0 0
+c 46054   10D06  V SANTA BARB W    3431204  10.0 2
+c 46059    6N32  D CALIFORNIA      3801300   5.0 1
+c 46060   3dv04  v n.p.wm.sound    6061468   5.0 2
+c 46061    3n34  /v.s.p.wm.sound   6021468   5.0 2
+c 46062   10d06  /d pnt. san lu    3511210  10.0 2
+c 46063    6n39  /d pnt.concept.   3431207   5.0 2
+  46066    NDBC                    5271550   5.0 1
+  51001    6N27  G NW HAWAII       2341623   5.0 1
+  51002    6N18  G SW HAWAII       1721578   5.0 1
+  51003    6N20  G W HAWAII        1921608   5.0 1
+  51004    6N24  G SE HAWAII       1741525   5.0 1
+c 51028    3D17  D N MOLOKAI       0001539   5.0 2
+c 46004      6N  CANADA            5091358   5.0 1
+c 46036      6N  CANADA            4841339   5.0 1
+c 46131      6N  CANADA            4991250   5.0 0
+c 46145      3D  CANADA            5441324   5.0 0
+c 46146      3D  CANADA            4931237   5.0 0
+c 46147      3D  CANADA            5181312   5.0 2
+c 46181      3D  CANADA            5381288   5.0 0
+c 46183      3D  CANADA            5361311   5.0 0
+  46184      6N  CANADA            5391388   5.0 1
+c 46185      3D  CANADA            5241298   5.0 2
+c 46204      3D  CANADA            5141287   5.0 2
+c 46205      3D  CANADA            5421343   5.0 2
+c 46206      3D  CANADA            4831260   5.0 2
+c 46207      3D  CANADA            5081299   5.0 2
+c 46208      3D  CANADA            5251327   5.0 2
+c 44131      3D  CANADA            451 608   5.0 2
+  44137      6N  CANADA            418 609   5.0 1
+c 44138      6N  CANADA            442 536   5.0 1
+c 44139      6N  CANADA            443 574   5.0 1
+  44141      6N  CANADA            421 561   5.0 1
+  44142      6N  CANADA            425 642   5.0 1
+c 44144          canada            438 641   5.0 1
+c 44145          canada            467 487   5.0 1
+c 44147          canada            463 482   5.0 1
+c 44251          canada            464 534   5.0 2
+c 21004          JAPAN             2892551   8.6 1
+c 21002          JAPAN             3792555   8.6 1
+c 22001          JAPAN             2812337   8.6 1
+  62029   UK                       487 124   4.0 1
+c 62052   UK                       485  56   4.0 1
+  62081   UK                       510 133   4.0 1
+c 62105   UK                       549 126   4.0 1
+c 62106   UK                       570  99   4.0 1
+  62108   UK                       535 195   4.0 1
+c 62109   UK                       5703600   4.0 2
+c 62114   UK                       5833599   4.0 1
+c 62133   UK                       5713590   4.0 2
+c 62162   UK                       5743595   4.0 2
+c 63103   UK                       6123589   4.0 1
+  64045   UK                       591 114   4.0 1
+9999999
+c 99999999  OFFSHR = 1  INSHR = 2  LAND = 0  999 9 for last column.
+c buoyID   Buoy    Name            Lat Lon Anometer  sea notes at 1=nea
+c          Type                  (0.1deg)  hgt (m)   bottom for the last column
+c                                North+  (lon + for W)
+c                                South-

@@ -1,0 +1,133 @@
+#!/bin/bash
+#
+###############################################################################
+#                                                                             #
+#                                                                             #
+# March-2019 RPadilla & JHAlves                                               #
+#                   - Merging wave scripts to global workflow for GEFSv12.0   #
+#                                                                             #
+###############################################################################
+set -xa
+
+# #### 05/04/99 #####################
+# SET WAVE SHELL PROCESSING VARIABLES
+# ###################################
+export PS4='$SECONDS + '
+date
+
+#
+# obtain unique process id (pid) and make temp directory
+#
+export pid=$$
+#
+# Default is YES. Change to NO to run with only NCEP members
+export RUN_FNMOC=${RUN_FNMOC:-YES}
+
+# PATH for working directory
+export DATA=${DATA:-${DATAROOT:?}/${jobid}}
+export KEEPDATA=${KEEPDATA:-YES}
+mkdir -p $DATA
+
+if [ ! -d $DATA ]
+then
+  echo '  *** NFCENS problem        ***'
+  echo '  *** NO $DATA directory  ***'
+    err=1;export err; err_chk
+fi
+
+cd $DATA
+
+export cycle=t${cyc}z 
+
+
+####################################
+# Determine Job Output Name on System
+####################################
+export pgmout="OUTPUT.$$"
+
+export MP_PULSE=0
+
+export SENDCOM=${SENDCOM:-YES}
+export SENDDBN=${SENDDBN:-YES}
+export SENDECF=${SENDECF:-YES}
+
+export sigMODE=post # Only post-processing done here, but may need to be revised by NCO
+
+export NET=wave
+export RUN=nfcens
+export gridID=${gridID:-'global.0p25'}
+export END_HOUR=${END_HOUR:-240}  
+export FHMAX_WAV=${FHMAX_WAV:-240}    #Total of hours to process
+export FHMAX_HF_WAV=${FHMAX_HF_WAV:-240} #Up to 240 inc=3, from there inc=6
+export FHOUT_WAV=${FHOUT_WAV:-3}
+export FHOUT_HF_WAV=${FHOUT_HF_WAV:-3}
+export npert=${npert:-20}
+
+export modID=nfcens             # NCEP model ID For this j-job
+#export ctlID=gwes00             # NCEP model ID for control member
+#export ensID=gwes               # NCEP model ID for ensemble members
+export model=gefs.wave
+export fnmID=ENSEMBLE.halfDegree.OCN.fcst  # FNMOC model ID
+
+
+####################################
+# Path to HOME Directory
+####################################
+
+export HOMEwave=${HOMEwave:-$NWROOT/wave_nfcens.${wave_nfcens_ver}}
+export CODEwave=${CODEwave:-$NWROOT/${NET}_code.$code_ver}
+
+export EXECwave=${EXECwave:-$HOMEwave/exec}
+export FIXwave=${FIXwave:-$HOMEwave/fix}
+
+####################################
+# load modules
+####################################
+#module use ${HOMEwave}/modulefiles
+#module load runtime_nfcens.modules
+
+# Set PDY
+sh setpdy.sh
+. PDY
+
+###################################
+# Set COM Paths
+###################################
+export COMROOT=${COMROOT:-$(compath.py ${envir}/com/${NET}/${wave_nfcens_ver})}
+##export COMIN=${COMIN:-$(compath.py gefs/prod/gefs).${PDY}/${cyc}/wave/gridded}
+export COMIN=${COMIN:-$(compath.py ${envir}/com/gefs/${gefs_ver}/gefs).${PDY}/${cyc}/wave/gridded}
+export COMFN=${COMFN:-$DCOMROOT/${PDY}/wgrbbul/fnmoc_ocn_ens_0p5_gb2} # Directory for incoming FNMOC data
+export COMOUT=${COMOUT:-${COMROOT}/${RUN}.${PDY}}
+
+mkdir -p ${COMOUT}
+
+export wavelog=${COMOUT}/wave.log
+ 
+env
+
+###################################
+# Execute the Script
+###################################
+
+$HOMEwave/scripts/exwave_nfcens.sh
+
+export err=$?; err_chk
+
+msg="JOB $job HAS COMPLETED NORMALLY."
+postmsg $jlogfile "$msg"
+
+f [ -e "$pgmout" ]; then
+  cat $pgmout
+  fi
+
+
+###################################
+# Remove temp directories
+###################################
+if [ "$KEEPDATA" != "YES" ]; then
+  cd $DATAROOT
+  rm -rf $DATA
+fi
+
+date
+

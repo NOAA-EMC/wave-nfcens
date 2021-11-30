@@ -1,0 +1,109 @@
+#!/bin/bash
+#
+# March-2020 RPadilla & JHAlves                                       +
+#           - For GEFSv12.0                                           +
+#                                                                     +
+######################################################################
+set -xa
+# #### 08/25/1999 ###################
+# SET SHELL PROCESSING VARIABLES
+# ###################################
+export PS4='$SECONDS + ' 
+date
+# 
+
+#
+export pid=$$
+export DATA=${DATA:-${DATAROOT:?}/${jobid}}
+if [ ! -d $DATA ]
+then
+  NO directory   
+fi
+cd $DATA
+
+####################################
+# Determine Job Output Name on System
+####################################
+export pgmout="OUTPUT.$$"
+
+export cycle=t${cyc}z 
+
+####################################
+# Determine Job Output Name on System
+####################################
+export pgmout="OUTPUT.$$"
+
+export MP_PULSE=0
+
+#export SENDCOM=${SENDCOM:-YES}
+#export SENDDBN=${SENDDBN:-YES}
+#export SENDECF=${SENDECF:-YES}
+
+export sigMODE=post # Only post-processing done here, but may need to be revised by NCO
+
+####################################
+# Path to HOME Directory
+####################################
+
+export HOMEwave=${HOMEwave:-${NWROOT}/wave_nfcens.${wave_nfcens_ver}}
+export GEMwave=${GEMwave:-$HOMEwave/gempak}
+export FIXwave=${FIXwave:-HOMEwave/fix}
+
+####################################
+# load modules
+####################################
+# module use ${HOMEwave}/modulefiles
+# module load runtime_nfcens.modules
+
+# Run setpdy and initialize PDY variables
+#sh setpdy.sh
+#. PDY
+export PDY=20211109
+export cyc=00
+
+
+#
+# Set up model and cycle specific variables
+#
+export NET=wave
+export RUN=nfcens
+export fend=00
+export finc=1
+export fstart=00
+export GRIB=grib
+export EXT=""
+export DBN_ALERT_TYPE=NFC_WAVEENS_GEMPAK
+
+####COMIN=/gpfs/dell1/nco/ops/com/wave/prod/nfcens.20211031/what_wavenfcens_used.t00z
+export COMIN=${COMIN:-${COMROOT}/${NET}/${envir}/${RUN}.${PDY}}
+export COMOUT=${COMOUT:-${COMROOT}/${NET}/${envir}/${RUN}.${PDY}/gempak}
+
+if [ ! -f $COMOUT ] ; then
+  mkdir -p -m 775 $COMOUT
+fi
+
+#######################
+# Copy job specific GEMPAK table for FNMOC grib2 files
+#######################
+cp ${GEMwave}/fix/g2varswmo5.tbl .
+cp ${GEMwave}/fix/g2vcrdwmo5.tbl .
+cp ${GEMwave}/fix/g2varswmo2.tbl .
+cp ${GEMwave}/fix/g2vcrdwmo2.tbl .
+ 
+env
+
+########################################################
+# Execute the script.
+/${HOMEwave}/scripts/exnawips_nfcens.sh
+########################################################
+
+exit
+cat $pgmout
+
+if [ "$KEEPDATA" != "YES" ]; then
+  cd $DATAROOT
+  rm -rf $DATA
+fi
+
+date
+

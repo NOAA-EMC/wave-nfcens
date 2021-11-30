@@ -1,0 +1,1024 @@
+Page 1           Source Listing                  NFCOMB_MAIN
+2021-10-20 02:21                                 nfcombwave_ensemble.f90
+
+      1 !- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+ + + ++
+      2 !
+      3       module ens_common
+      4 !
+      5 !     D. Cao 2008
+      6 !      Multiscale model ensemble
+      7 !
+      8 !     Revised by Vera Gerald, June 2011: including new grib2 output interface
+      9 !     Revised by J-Henrique Alves, June 2011: cleanup, removed pdsgds sbr 
+     10 !                       (grib2 parameter definitions now all made in grbit2.f)
+     11 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - --+ + + ++
+     12 ! Y. Y. Chao,  20110620 
+     13 ! From original by HS Chen, 2004
+     14 ! For common scales and arrays.
+     15 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - --+ + + ++
+     16 !
+     17       implicit none
+     18 !
+     19       integer,parameter :: nx=360,ny=181,nxy=nx*ny
+     20       integer,parameter :: lcgrib=4*nxy
+     21       real,parameter :: x0=0.00,xend=359.00,dx=1.00
+     22       real,parameter :: y0=-90.00,yend=90.00,dy=1.00
+     23       integer,parameter :: iu11=11,iu12=12
+     24       integer,parameter :: iu51=51,iu52=52,iu53=53,iu54=54,iu59=59
+     25       real,parameter :: defv=1.0e10,tolr=1.0e-8,zero=0.0
+     26 !
+     27       character :: id_para*5
+     28       integer :: kpds(25),kgds(22)
+     29       integer :: ymdc,fhr,nnme,nnsc,in_para
+     30       integer :: idumy(nx,ny),istop
+     31       real    :: dumy1d(nxy)
+     32 !
+     33 ! buoys.
+     34 !
+     35       integer :: nnb,readbuoy=1
+     36       real,allocatable    :: xbuoy(:),ybuoy(:),rbuoy(:,:)
+     37       integer,allocatable :: ixbuoy(:,:),jybuoy(:,:)
+     38       character(len=5),allocatable :: idbuoy(:)
+     39 !
+     40 !
+     41       character(len=13) :: fname
+     42       logical*1 :: lbms2d(nx,ny),lbms1d(nxy)
+     43       real      :: fsum(nx,ny),fmean(nx,ny),fspre(nx,ny)
+     44       character,allocatable        :: id_member(:)*2
+     45       character(len=7),allocatable :: id_file(:)
+     46       real,allocatable             :: f(:,:,:),fprob(:,:,:),scale(:)
+     47 !
+     48       real :: gmean,gspre
+     49       real,allocatable :: g(:),gprob(:)
+     50 !
+     51 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - --+ + + ++
+     52       endmodule ens_common
+
+Page 2           Source Listing                  NFCOMB_MAIN
+2021-10-20 02:21 Symbol Table                    nfcombwave_ensemble.f90
+
+
+
+SYMBOL CROSS REFERENCE
+
+ Name                       Object Declared Type            Bytes Dimen Elements Attributes       References                        
+                                                                                                                                    
+ DEFV                       Param  25       R(4)            4           scalar                                                      
+ DUMY1D                     Local  31       R(4)            4     1     65160                                                       
+ DX                         Param  21       R(4)            4           scalar                                                      
+ DY                         Param  22       R(4)            4           scalar                                                      
+ ENS_COMMON                 Module 3                                                                                                
+ F                          Local  46       R(4)            4     3     1        ALC                                                
+ FHR                        Local  29       I(4)            4           scalar                                                      
+ FMEAN                      Local  43       R(4)            4     2     65160                                                       
+ FNAME                      Local  41       CHAR            13          scalar                                                      
+ FPROB                      Local  46       R(4)            4     3     1        ALC                                                
+ FSPRE                      Local  43       R(4)            4     2     65160                                                       
+ FSUM                       Local  43       R(4)            4     2     65160                                                       
+ G                          Local  49       R(4)            4     1     1        ALC                                                
+ GMEAN                      Local  48       R(4)            4           scalar                                                      
+ GPROB                      Local  49       R(4)            4     1     1        ALC                                                
+ GSPRE                      Local  48       R(4)            4           scalar                                                      
+ IDBUOY                     Local  38       CHAR            5     1     1        ALC                                                
+ IDUMY                      Local  30       I(4)            4     2     65160                                                       
+ ID_FILE                    Local  45       CHAR            7     1     1        ALC                                                
+ ID_MEMBER                  Local  44       CHAR            2     1     1        ALC                                                
+ ID_PARA                    Local  27       CHAR            5           scalar                                                      
+ IN_PARA                    Local  29       I(4)            4           scalar                                                      
+ ISTOP                      Local  30       I(4)            4           scalar                                                      
+ IU11                       Param  23       I(4)            4           scalar                                                      
+ IU12                       Param  23       I(4)            4           scalar                                                      
+ IU51                       Param  24       I(4)            4           scalar                                                      
+ IU52                       Param  24       I(4)            4           scalar                                                      
+ IU53                       Param  24       I(4)            4           scalar                                                      
+ IU54                       Param  24       I(4)            4           scalar                                                      
+ IU59                       Param  24       I(4)            4           scalar                                                      
+ IXBUOY                     Local  37       I(4)            4     2     1        ALC                                                
+ JYBUOY                     Local  37       I(4)            4     2     1        ALC                                                
+ KGDS                       Local  28       I(4)            4     1     22                                                          
+ KPDS                       Local  28       I(4)            4     1     25                                                          
+ LBMS1D                     Local  42       L(1)            1     1     65160                                                       
+ LBMS2D                     Local  42       L(1)            1     2     65160                                                       
+ LCGRIB                     Param  20       I(4)            4           scalar                                                      
+ NNB                        Local  35       I(4)            4           scalar                                                      
+ NNME                       Local  29       I(4)            4           scalar                                                      
+ NNSC                       Local  29       I(4)            4           scalar                                                      
+ NX                         Param  19       I(4)            4           scalar                    19,30,42,43                       
+ NXY                        Param  19       I(4)            4           scalar                    20,31,42                          
+ NY                         Param  19       I(4)            4           scalar                    19,30,42,43                       
+ RBUOY                      Local  36       R(4)            4     2     1        ALC                                                
+ READBUOY                   Local  35       I(4)            4           scalar                    35                                
+ SCALE                      Local  46       R(4)            4     1     1        ALC                                                
+ TOLR                       Param  25       R(4)            4           scalar                                                      
+ X0                         Param  21       R(4)            4           scalar                                                      
+ XBUOY                      Local  36       R(4)            4     1     1        ALC                                                
+ XEND                       Param  21       R(4)            4           scalar                                                      
+ Y0                         Param  22       R(4)            4           scalar                                                      
+
+Page 3           Source Listing                  NFCOMB_MAIN
+2021-10-20 02:21 Symbol Table                    nfcombwave_ensemble.f90
+
+ Name                       Object Declared Type            Bytes Dimen Elements Attributes       References                        
+                                                                                                                                    
+ YBUOY                      Local  36       R(4)            4     1     1        ALC                                                
+ YEND                       Param  22       R(4)            4           scalar                                                      
+ YMDC                       Local  29       I(4)            4           scalar                                                      
+ ZERO                       Param  25       R(4)            4           scalar                                                      
+
+Page 4           Source Listing                  NFCOMB_MAIN
+2021-10-20 02:21                                 nfcombwave_ensemble.f90
+
+     53 !
+     54 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - --+ + + ++
+     55 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - --+ + + ++
+     56       PROGRAM nfcomb_main
+     57 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+ + + ++
+     58 !$$$  MAIN PROGRAM DOCUMENTATION BLOCK
+     59 !                .      .    .                                       .
+     60 ! MAIN PROGRAM:  ensemble    conduct ensemble statistics.
+     61 !   PRGMMR: H.S. CHEN        ORG: W/MP21     DATE: 04-05-20
+     62 !
+     63 ! ABSTRACT: conduct ensemble statistics.
+     64 !
+     65 ! PROGRAM HISTORY LOG:
+     66 !   04-05-20  H.S. Chen      Origination and implement at NCEP.
+     67 !
+     68 ! USAGE:
+     69 !**   Interface.
+     70 !     ----------
+     71 !       The program nfcomb_main runs independently and must run after the
+     72 !       wave model.
+     73 !
+     74 !     Input File: 
+     75 !     ------------
+     76 !      nfcomb_input  - Provides date, parameter definitions, ensemble member
+     77 !                      names and numbers, probability level and input data
+     78 !                      file names (data_NN)
+     79 !     Output File: 
+     80 !     -------------
+     81 !      mean_out    - grib2 file containing combined ensemble mean
+     82 !      spread_out  - grib2 file containing combined ensemble spread
+     83 !      probab_out  - grib2 file containing combined ensemble probabilities of
+     84 !                    Hs exceeding a given value
+     85 !
+     86 !     Method.
+     87 !     -------
+     88 !       Interpolation at the closest grid point.       
+     89 !
+     90 !     Externals.
+     91 !     ----------
+     92 !
+     93 ! ATTRIBUTES:
+     94 !   LANGUAGE: FORTRAN 90
+     95 !   MACHINE:  CRAY-C90
+     96 !
+     97 !$$$
+     98 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - --+ + + ++
+     99 ! 
+    100       use ens_common
+    101 !
+    102       integer :: ierr,i,j,k,l,m,n,i1,i2,j1,j2,iret,leve
+    103 !
+    104 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - --+ + + ++
+    105 !     CALL W3TAGB('nww2ec  ',0097,0027,0075,'NP21   ')
+    106 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - --+ + + ++
+    107 !
+    108       call read_buoy
+    109 !
+
+Page 5           Source Listing                  NFCOMB_MAIN
+2021-10-20 02:21                                 nfcombwave_ensemble.f90
+
+    110 !  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+ + + ++
+    111 !
+    112       open (unit=iu51,file='station_out')
+    113 !
+    114       call baopen(iu52,'mean_out',iret)
+    115       write(*,'("** After baopen for mean, iret = ",i5)') iret
+    116       call baopen(iu53,'spread_out',iret)
+    117       write(*,'("** After baopen for spread, iret = ",i5)') iret
+    118       call baopen(iu54,'probab_out',iret)
+    119       write(*,'("** After baopen for probab, iret = ",i5)') iret
+    120 !
+    121       open (unit=iu59,file='test_out')
+    122 !
+    123       read(*,*) ymdc,fhr,id_para,in_para
+    124       write(iu59,'(i10.10,2x,i3.3,2x,a5,i7)') ymdc,fhr,id_para,in_para 
+    125       read(*,*) nnme
+    126       write(iu59,'(i4)') nnme
+    127       allocate( id_member(nnme) )
+    128       read(*,*) id_member(:)
+    129       write(iu59,'(20(1x,a2))') id_member(:)
+    130       read(*,*) nnsc
+    131       write(iu59,'(i4)') nnsc
+    132 !    
+    133       allocate( scale(nnsc) )
+    134       scale(:) = 0.0
+    135         read(*,*) scale(:)
+    136         write(iu59,'(10f8.3)') scale(:)
+    137 !
+    138       allocate( id_file(nnme) )
+    139       read(*,*) id_file(:)
+    140       write(iu59,'(10(1x,a7))') id_file(:)
+    141 !
+    142       allocate( f(nx,ny,nnme) )
+    143       allocate( fprob(nx,ny,nnsc) )
+    144 !
+    145       allocate( g(nnme) )
+    146       allocate( gprob(nnsc) )
+    147 !
+    148 !  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+ + + ++
+    149 !
+    150       f(:,:,:) = 0.0
+    151       do m=1,nnme
+    152 !
+    153         fname=id_file(m)
+    154         write(iu59,*) fname
+    155 !
+    156         open (iu11,file=fname,access='SEQUENTIAL',form='UNFORMATTED')
+    157 !
+    158         write(iu59,'("*** read f(m), m =",i4)') m
+    159         read (iu11,end=12,err=91,iostat=ierr)     &
+    160              ((f(i,j,m),i=1,nx),j=ny,1,-1)
+    161 !
+    162         where( f(:,:,m).ge.defv ) f(:,:,m) = zero
+    163 !
+    164    12   continue
+    165         close(iu11)
+    166       enddo
+
+Page 6           Source Listing                  NFCOMB_MAIN
+2021-10-20 02:21                                 nfcombwave_ensemble.f90
+
+    167 !
+    168 ! Calculate ensemble statistics.
+    169 !
+    170       call ens_statistics
+    171 !
+    172 ! Output.
+    173 !
+    174 ! Set up bitmap, lbms2d(:,:) and lbms1d(:), for missing data indicator; 
+    175 ! true for data, false for no data.
+    176 !
+    177       lbms2d(:,:) = .true.
+    178       where( fmean(:,:).le.zero ) lbms2d(:,:) = .false.
+    179 !
+    180       ij=1
+    181         do j=1,ny
+    182         do i=1,nx
+    183           lbms1d(ij)=lbms2d(i,j)
+    184           ij=ij+1
+    185         enddo
+    186       enddo
+    187 !
+    188 ! ensemble mean.
+    189 !
+    190       dumy1d(:)=0.0
+    191       ij=1
+    192       do j=1,ny
+    193         do i=1,nx
+    194           dumy1d(ij)=fmean(i,j)
+    195           ij=ij+1
+    196         enddo
+    197       enddo
+    198 !
+    199       call grbit2 (iu52,nx,ny,lcgrib,lbms1d,dumy1d,iret,ymdc,fhr, &
+    200                                      1,0,0,0,nnme)
+    201       if( iret.ne.0 ) then
+    202         write(*,'("**** ERR in grbit2, ymdc,fhr,in_para,id_para: ")')
+    203         write(*,'(1x,i10.10,1x,i3.3,i5,1x,a5)') ymdc,fhr,in_para,id_para
+    204       endif
+    205 !
+    206 ! ensemble spread.
+    207 !
+    208       dumy1d(:)=0.0
+    209       ij=1
+    210         do j=1,ny
+    211         do i=1,nx
+    212           dumy1d(ij)=fspre(i,j)
+    213           ij=ij+1
+    214         enddo
+    215       enddo
+    216 !
+    217       call grbit2 (iu53,nx,ny,lcgrib,lbms1d,dumy1d,iret,ymdc,fhr, &
+    218                                      2,0,0,0,nnme)
+    219       if( iret.ne.0 ) then
+    220         write(*,'("**** ERR in grbit2, ymdc,fhr,in_para,id_para: ")')
+    221         write(*,'(1x,i10.10,1x,i3.3,i5,1x,a5)') ymdc,fhr,in_para,id_para
+    222       endif
+    223 !
+
+Page 7           Source Listing                  NFCOMB_MAIN
+2021-10-20 02:21                                 nfcombwave_ensemble.f90
+
+    224 ! ensemble probability.
+    225 !
+    226       do l=1,nnsc
+    227 !
+    228         dumy1d(:)=0.0
+    229         ij=1
+    230         do j=1,ny
+    231           do i=1,nx
+    232             dumy1d(ij)=fprob(i,j,l)
+    233             ij=ij+1
+    234           enddo
+    235         enddo
+    236 !
+    237         leve = nint(100.*scale(l))
+    238         call grbit2 (iu54,nx,ny,lcgrib,lbms1d,dumy1d,iret,ymdc,fhr, &
+    239                                      3,nnsc,l,leve,nnme)
+    240         if( iret.ne.0 ) then
+    241           write(*,'("** ERR in grbit2, ymdc,fhr,in_para,id_para,leve:")')
+    242           write(*,'(1x,i10.10,1x,i3.3,i5,1x,a5,i7)')   &
+    243                   ymdc,fhr,in_para,id_para,leve
+    244         endif
+    245       enddo
+    246 !
+    247 ! interploation for stations.
+    248 !
+    249       if( nnb.gt.0 ) then
+    250         do l=1,nnb
+    251           i1 = ixbuoy(l,1)
+    252           i2 = ixbuoy(l,2)
+    253           j1 = jybuoy(l,1)
+    254           j2 = jybuoy(l,2)
+    255           do k=1,nnme
+    256             g(k) = rbuoy(l,1)*f(i1,j1,k) + rbuoy(l,2)*f(i2,j1,k) +   &
+    257                    rbuoy(l,3)*f(i2,j2,k) + rbuoy(l,4)*f(i1,j2,k)
+    258           enddo
+    259 !
+    260           call ens_stat1
+    261 !
+    262           write(iu51,'(i10.10,1x,i3.3,2(1x,a5),2f8.2)')    &
+    263                ymdc,fhr,id_para,idbuoy(l),xbuoy(l),ybuoy(l)
+    264           write(iu51,'(13f6.2,8f5.2)')    &
+    265                (g(m),m=1,nnme),gmean,gspre,(gprob(k),k=1,nnsc)
+    266         enddo
+    267       endif
+    268 !
+    269 !  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+ + + ++
+    270 !
+    271    91 continue
+    272 !
+    273 !  deallocate.
+    274 !
+    275       if( nnb.gt.0 ) then
+    276         deallocate( idbuoy,xbuoy,ybuoy,ixbuoy,jybuoy,rbuoy )
+    277       endif
+    278       deallocate( id_member )
+    279       deallocate( id_file,scale,fprob,f )
+    280       deallocate( g,gprob )
+
+Page 8           Source Listing                  NFCOMB_MAIN
+2021-10-20 02:21                                 nfcombwave_ensemble.f90
+
+    281 !
+    282       close(iu51)
+    283 !
+    284       call baclose(iu52,iret)
+    285       write(*,'("** After baclose for mean, iret= ",i5)') iret
+    286       call baclose(iu53,iret)
+    287       write(*,'("** After baclose for spread, iret= ",i5)') iret
+    288       call baclose(iu54,iret)
+    289       write(*,'("** After baclose for probab, iret= ",i5)') iret
+    290       close(iu59)
+    291 !
+    292       STOP
+    293       END
+
+
+ENTRY POINTS
+
+  Name              
+                    
+ MAIN__             
+
+
+SYMBOL CROSS REFERENCE
+
+ Name                       Object Declared Type            Bytes Dimen Elements Attributes       References                        
+                                                                                                                                    
+ 12                         Label  164                                                            159                               
+ 91                         Label  271                                                            159                               
+ BACLOSE                    Subr   284                                                            284,286,288                       
+ BAOPEN                     Subr   114                                                            114,116,118                       
+ DEFV                       Param  162      R(4)            4           scalar                    162                               
+ DUMY1D                     Local  190      R(4)            4     1     65160                     190,194,199,208,212,217,228,232,23
+                                                                                                  8                                 
+ ENS_COMMON                 Module 100                                                            100                               
+ ENS_STAT1                  Subr   260                                                            260                               
+ ENS_STATISTICS             Subr   170                                                            170                               
+ F                          Local  142      R(4)            4     3     1        ALC              142,150,160,162,256,257,279       
+ FHR                        Local  123      I(4)            4           scalar                    123,124,199,203,217,221,238,243,26
+                                                                                                  3                                 
+ FMEAN                      Local  178      R(4)            4     2     65160                     178,194                           
+ FNAME                      Local  153      CHAR            13          scalar                    153,154,156                       
+ FPROB                      Local  143      R(4)            4     3     1        ALC              143,232,279                       
+ FSPRE                      Local  212      R(4)            4     2     65160                     212                               
+ G                          Local  145      R(4)            4     1     1        ALC              145,256,265,280                   
+ GMEAN                      Local  265      R(4)            4           scalar                    265                               
+ GPROB                      Local  146      R(4)            4     1     1        ALC              146,265,280                       
+ GRBIT2                     Subr   199                                                            199,217,238                       
+ GSPRE                      Local  265      R(4)            4           scalar                    265                               
+ I                          Local  102      I(4)            4           scalar                    160,182,183,193,194,211,212,231,23
+                                                                                                  2                                 
+ I1                         Local  102      I(4)            4           scalar                    251,256,257                       
+ I2                         Local  102      I(4)            4           scalar                    252,256,257                       
+ IDBUOY                     Local  263      CHAR            5     1     1        ALC              263,276                           
+ ID_FILE                    Local  138      CHAR            7     1     1        ALC              138,139,140,153,279               
+ ID_MEMBER                  Local  127      CHAR            2     1     1        ALC              127,128,129,278                   
+ ID_PARA                    Local  123      CHAR            5           scalar                    123,124,203,221,243,263           
+ IERR                       Local  102      I(4)            4           scalar                    159                               
+
+Page 9           Source Listing                  NFCOMB_MAIN
+2021-10-20 02:21 Symbol Table                    nfcombwave_ensemble.f90
+
+ Name                       Object Declared Type            Bytes Dimen Elements Attributes       References                        
+                                                                                                                                    
+ IJ                         Local  180      I(4)            4           scalar                    180,183,184,191,194,195,209,212,21
+                                                                                                  3,229,232,233                     
+ IN_PARA                    Local  123      I(4)            4           scalar                    123,124,203,221,243               
+ IRET                       Local  102      I(4)            4           scalar                    114,115,116,117,118,119,199,201,21
+                                                                                                  7,219,238,240,284,285,286,287,288,
+                                                                                                  289                               
+ IU11                       Param  156      I(4)            4           scalar                    156,159,165                       
+ IU51                       Param  112      I(4)            4           scalar                    112,262,264,282                   
+ IU52                       Param  114      I(4)            4           scalar                    114,199,284                       
+ IU53                       Param  116      I(4)            4           scalar                    116,217,286                       
+ IU54                       Param  118      I(4)            4           scalar                    118,238,288                       
+ IU59                       Param  121      I(4)            4           scalar                    121,124,126,129,131,136,140,154,15
+                                                                                                  8,290                             
+ IXBUOY                     Local  251      I(4)            4     2     1        ALC              251,252,276                       
+ J                          Local  102      I(4)            4           scalar                    160,181,183,192,194,210,212,230,23
+                                                                                                  2                                 
+ J1                         Local  102      I(4)            4           scalar                    253,256                           
+ J2                         Local  102      I(4)            4           scalar                    254,257                           
+ JYBUOY                     Local  253      I(4)            4     2     1        ALC              253,254,276                       
+ K                          Local  102      I(4)            4           scalar                    255,256,257,265                   
+ L                          Local  102      I(4)            4           scalar                    226,232,237,239,250,251,252,253,25
+                                                                                                  4,256,257,263                     
+ LBMS1D                     Local  183      L(1)            1     1     65160                     183,199,217,238                   
+ LBMS2D                     Local  177      L(1)            1     2     65160                     177,178,183                       
+ LCGRIB                     Param  199      I(4)            4           scalar                    199,217,238                       
+ LEVE                       Local  102      I(4)            4           scalar                    237,239,243                       
+ M                          Local  102      I(4)            4           scalar                    151,153,158,160,162,265           
+ N                          Local  102      I(4)            4           scalar                                                      
+ NFCOMB_MAIN                Prog   56                                                                                               
+ NINT                       Func   237                                  scalar                    237                               
+ NNB                        Local  249      I(4)            4           scalar                    249,250,275                       
+ NNME                       Local  125      I(4)            4           scalar                    125,126,127,138,142,145,151,200,21
+                                                                                                  8,239,255,265                     
+ NNSC                       Local  130      I(4)            4           scalar                    130,131,133,143,146,226,239,265   
+ NX                         Param  142      I(4)            4           scalar                    142,143,160,182,193,199,211,217,23
+                                                                                                  1,238                             
+ NY                         Param  142      I(4)            4           scalar                    142,143,160,181,192,199,210,217,23
+                                                                                                  0,238                             
+ RBUOY                      Local  256      R(4)            4     2     1        ALC              256,257,276                       
+ READ_BUOY                  Subr   108                                                            108                               
+ SCALE                      Local  133      R(4)            4     1     1        ALC              133,134,135,136,237,279           
+ XBUOY                      Local  263      R(4)            4     1     1        ALC              263,276                           
+ YBUOY                      Local  263      R(4)            4     1     1        ALC              263,276                           
+ YMDC                       Local  123      I(4)            4           scalar                    123,124,199,203,217,221,238,243,26
+                                                                                                  3                                 
+ ZERO                       Param  162      R(4)            4           scalar                    162,178                           
+
+Page 10          Source Listing                  NFCOMB_MAIN
+2021-10-20 02:21                                 nfcombwave_ensemble.f90
+
+    294 !
+    295 !
+    296       subroutine read_buoy
+    297 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - --++ + + +
+    298 !  read buoy id, lan, lat from fix buoy location list.
+    299 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - --++ + + +
+    300 !
+    301       use ens_common
+    302 !
+    303 !  local
+    304 !
+    305       character :: cdumy*1,cbid*5,cbtype*5,cbown*16
+    306       integer   :: lon,lat,loc,nnb1,k,m,i1,i2,j1,j2
+    307       real      :: anem,rx1,ry1
+    308 !
+    309 !- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+ + + ++
+    310 !  calculate ratios only readbuoy.ge.1 .
+    311 !
+    312       if( readbuoy.lt.1) goto 50
+    313 !
+    314       open (iu11,file='buoy_file.data')
+    315       open (iu51,file='buoy_ratio.data')
+    316 !
+    317       nnb=0
+    318    14 continue
+    319         read (iu11,18,end=20) cdumy,cbid,cbtype,cbown,lat,lon,anem,loc
+    320         if( cdumy.eq.'9' ) goto 20
+    321         if( cdumy.eq.'c' ) goto 14
+    322         nnb = nnb + 1
+    323         goto 14
+    324    18 format(a1,1x,a5,3x,a5,2x,a16,1x,2i4,f6.1,i2)
+    325 !
+    326    20 continue
+    327       if( nnb.lt.1 ) then
+    328         write(*,'(" **** nnb=",i5)') nnb
+    329         stop
+    330       endif
+    331 !
+    332       allocate( xbuoy(nnb) ) 
+    333       allocate( ybuoy(nnb) ) 
+    334       allocate( ixbuoy(nnb,2) ) 
+    335       allocate( jybuoy(nnb,2) ) 
+    336       allocate( rbuoy(nnb,4) ) 
+    337       allocate( idbuoy(nnb) ) 
+    338 !
+    339       rewind iu11
+    340       nnb1=0
+    341    24 continue
+    342         read (iu11,18,end=30) cdumy,cbid,cbtype,cbown,lat,lon,anem,loc
+    343         if( cdumy.eq.'9' ) goto 30
+    344         if( cdumy.eq.'c' ) goto 24
+    345         nnb1 = nnb1 + 1
+    346         idbuoy(nnb1) = cbid
+    347         ybuoy(nnb1) = 0.1*lat
+    348         xbuoy(nnb1) = 360.0 - 0.1*lon
+    349         goto 24
+    350 !
+
+Page 11          Source Listing                  READ_BUOY
+2021-10-20 02:21                                 nfcombwave_ensemble.f90
+
+    351    30 continue
+    352       write(*,'(" *** end of iu11 file *** ")')
+    353       if( nnb1.ne.nnb ) then
+    354         write(*,'(" **** nnb1=",i4," is not equal to nnb=",i4)') nnb1,nnb
+    355         stop 1
+    356       endif
+    357 !
+    358       close( iu11)
+    359 !
+    360 ! interpolation ratios.
+    361 !
+    362       if( nnb.ge.1 ) then
+    363         do k=1,nnb
+    364           i1 = int((xbuoy(k)-x0)/dx) + 1
+    365           i2 = i1 + 1
+    366           if( i2.gt.nx ) i2=i2-nx
+    367           rx1 = (xbuoy(k)-x0)/dx - float(i1-1)
+    368           j1 = int((ybuoy(k)-y0)/dy) + 1
+    369           j2 = j1 + 1
+    370           if( j2.gt.ny ) j2=j2
+    371           ry1 = (ybuoy(k)-y0)/dy - float(j1-1)
+    372           ixbuoy(k,1)=i1
+    373           ixbuoy(k,2)=i2
+    374           jybuoy(k,1)=j1
+    375           jybuoy(k,2)=j2
+    376           rbuoy(k,1) = (1.0-rx1)*(1.0-ry1)
+    377           rbuoy(k,2) =      rx1 *(1.0-ry1)
+    378           rbuoy(k,3) =      rx1 *     ry1 
+    379           rbuoy(k,4) = (1.0-rx1)*     ry1 
+    380         enddo
+    381       else
+    382         write(*,'(" **** no buoy used ****")')
+    383       endif
+    384 !
+    385       write(iu51,'(i10)') nnb
+    386       if( nnb.ge.1 ) then
+    387         do k=1,nnb
+    388           write(iu51,40)  k,idbuoy(k),xbuoy(k),ybuoy(k),   &
+    389             (ixbuoy(k,m),m=1,2),(jybuoy(k,m),m=1,2),       &
+    390             (rbuoy(k,m),m=1,4)
+    391         enddo
+    392       endif
+    393    40 format(i5,1x,a5,2f8.2,4i5,4f8.4)  
+    394 !
+    395       close( iu11 )
+    396       close( iu51 )
+    397 !
+    398       return
+    399 !
+    400 !- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+ + + ++
+    401 ! read only, distribution ratios already exist.
+    402 !
+    403    50 continue
+    404       open (iu11,file='buoy_ratio.data')
+    405       read (iu11,'(i10)') nnb
+    406 !!      write(*,'(i10)') nnb
+    407 !
+
+Page 12          Source Listing                  READ_BUOY
+2021-10-20 02:21                                 nfcombwave_ensemble.f90
+
+    408       if( nnb.ge.1 ) then
+    409 !
+    410         allocate( xbuoy(nnb) ) 
+    411         allocate( ybuoy(nnb) ) 
+    412         allocate( ixbuoy(nnb,2) ) 
+    413         allocate( jybuoy(nnb,2) ) 
+    414         allocate( rbuoy(nnb,4) ) 
+    415         allocate( idbuoy(nnb) ) 
+    416 !
+    417         do k=1,nnb
+    418           read (iu11,40)  m,idbuoy(m),xbuoy(m),ybuoy(m),   &
+    419             (ixbuoy(m,n),n=1,2),(jybuoy(m,n),n=1,2),       &
+    420             (rbuoy(m,n),n=1,4)
+    421         enddo
+    422       else
+    423         write(*,'("**** no buoy, no buoy arraysallocation ****")')
+    424       endif
+    425 !
+    426       close( iu11 )
+    427 !
+    428 !- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+ + + ++
+    429 ! end subroutine read_buoy.
+    430 !- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+ + + ++
+    431 !
+    432       return
+    433       end
+
+
+ENTRY POINTS
+
+  Name                  
+                        
+ read_buoy_             
+
+Page 13          Source Listing                  READ_BUOY
+2021-10-20 02:21 Symbol Table                    nfcombwave_ensemble.f90
+
+
+
+SYMBOL CROSS REFERENCE
+
+ Name                       Object Declared Type            Bytes Dimen Elements Attributes       References                        
+                                                                                                                                    
+ 14                         Label  318                                                            321,323                           
+ 18                         Label  324                                                            319,342                           
+ 20                         Label  326                                                            319,320                           
+ 24                         Label  341                                                            344,349                           
+ 30                         Label  351                                                            342,343                           
+ 40                         Label  393                                                            388,418                           
+ 50                         Label  403                                                            312                               
+ ANEM                       Local  307      R(4)            4           scalar                    319,342                           
+ CBID                       Local  305      CHAR            5           scalar                    319,342,346                       
+ CBOWN                      Local  305      CHAR            16          scalar                    319,342                           
+ CBTYPE                     Local  305      CHAR            5           scalar                    319,342                           
+ CDUMY                      Local  305      CHAR            1           scalar                    319,320,321,342,343,344           
+ DX                         Param  364      R(4)            4           scalar                    364,367                           
+ DY                         Param  368      R(4)            4           scalar                    368,371                           
+ ENS_COMMON                 Module 301                                                            301                               
+ FLOAT                      Func   367                                  scalar                    367,371                           
+ I1                         Local  306      I(4)            4           scalar                    364,365,367,372                   
+ I2                         Local  306      I(4)            4           scalar                    365,366,373                       
+ IDBUOY                     Local  337      CHAR            5     1     1        ALC              337,346,388,415,418               
+ INT                        Func   364                                  scalar                    364,368                           
+ IU11                       Param  314      I(4)            4           scalar                    314,319,339,342,358,395,404,405,41
+                                                                                                  8,426                             
+ IU51                       Param  315      I(4)            4           scalar                    315,385,388,396                   
+ IXBUOY                     Local  334      I(4)            4     2     1        ALC              334,372,373,389,412,419           
+ J1                         Local  306      I(4)            4           scalar                    368,369,371,374                   
+ J2                         Local  306      I(4)            4           scalar                    369,370,375                       
+ JYBUOY                     Local  335      I(4)            4     2     1        ALC              335,374,375,389,413,419           
+ K                          Local  306      I(4)            4           scalar                    363,364,367,368,371,372,373,374,37
+                                                                                                  5,376,377,378,379,387,388,389,390,
+                                                                                                  417                               
+ LAT                        Local  306      I(4)            4           scalar                    319,342,347                       
+ LOC                        Local  306      I(4)            4           scalar                    319,342                           
+ LON                        Local  306      I(4)            4           scalar                    319,342,348                       
+ M                          Local  306      I(4)            4           scalar                    389,390,418,419,420               
+ N                          Local  419      I(4)            4           scalar                    419,420                           
+ NNB                        Local  317      I(4)            4           scalar                    317,322,327,328,332,333,334,335,33
+                                                                                                  6,337,353,354,362,363,385,386,387,
+                                                                                                  405,408,410,411,412,413,414,415,41
+                                                                                                  7                                 
+ NNB1                       Local  306      I(4)            4           scalar                    340,345,346,347,348,353,354       
+ NX                         Param  366      I(4)            4           scalar                    366                               
+ NY                         Param  370      I(4)            4           scalar                    370                               
+ RBUOY                      Local  336      R(4)            4     2     1        ALC              336,376,377,378,379,390,414,420   
+ READBUOY                   Local  312      I(4)            4           scalar                    312                               
+ READ_BUOY                  Subr   296                                                                                              
+ RX1                        Local  307      R(4)            4           scalar                    367,376,377,378,379               
+ RY1                        Local  307      R(4)            4           scalar                    371,376,377,378,379               
+ X0                         Param  364      R(4)            4           scalar                    364,367                           
+ XBUOY                      Local  332      R(4)            4     1     1        ALC              332,348,364,367,388,410,418       
+ Y0                         Param  368      R(4)            4           scalar                    368,371                           
+ YBUOY                      Local  333      R(4)            4     1     1        ALC              333,347,368,371,388,411,418       
+
+Page 14          Source Listing                  READ_BUOY
+2021-10-20 02:21                                 nfcombwave_ensemble.f90
+
+    434 !
+    435 !
+    436       subroutine ens_statistics
+    437 !- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+ + + ++
+    438 !- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+ + + ++
+    439 ! Calculate ensemble statistics.
+    440 !   input : nx   = number of x points.
+    441 !           ny   = number of y points.
+    442 !           me   = number of ensemble members.
+    443 !           nnsc = number of scales for probability.
+    444 !           f(nx,ny,me)  = field array.
+    445 !           fsum(nx,ny)  = only used for calculating sum.
+    446 !           fscale(nnsc) = scale array.
+    447 !   output: fmean(nx,ny)      = ensemble mean array.
+    448 !           fspre(nx,ny)      = ensemble spread array.
+    449 !           fprob(nx,ny,nnsc) = ensemble probability.
+    450 !- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+ + + ++
+    451 !
+    452       use ens_common
+    453 !
+    454 !  local
+    455 !
+    456       integer :: m,n,i,j,k
+    457 !
+    458 !- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+ + + ++
+    459 !
+    460 !  mean.
+    461 !
+    462       fsum(:,:) = 0.0
+    463       do m=1,nnme
+    464         fsum(:,:) = fsum(:,:) + f(:,:,m)
+    465       enddo
+    466       fmean(:,:) = fsum(:,:)/real(nnme)
+    467 !
+    468 !  spread - deviation.
+    469 !
+    470       fspre(:,:) = 0.0
+    471       do m=1,nnme
+    472         fspre(:,:) = fspre(:,:) + (f(:,:,m)-fmean(:,:))**2
+    473       enddo
+    474       fspre(:,:) = sqrt( fspre(:,:)/real(nnme) )
+    475 !
+    476 !  probability.
+    477 !
+    478      fprob(:,:,:) = 0.0
+    479       do n=1,nnsc
+    480         do m=1,nnme
+    481           where( f(:,:,m).ge.scale(n) ) fprob(:,:,n)=fprob(:,:,n)+1.
+    482         enddo     
+    483         fprob(:,:,n) = fprob(:,:,n)/real(nnme)
+    484       enddo     
+    485 !
+    486 !- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+ + + ++
+    487 !
+    488       return
+    489       end
+
+Page 15          Source Listing                  ENS_STATISTICS
+2021-10-20 02:21 Entry Points                    nfcombwave_ensemble.f90
+
+
+
+ENTRY POINTS
+
+  Name                       
+                             
+ ens_statistics_             
+
+
+SYMBOL CROSS REFERENCE
+
+ Name                       Object Declared Type            Bytes Dimen Elements Attributes       References                        
+                                                                                                                                    
+ ENS_COMMON                 Module 452                                                            452                               
+ ENS_STATISTICS             Subr   436                                                                                              
+ F                          Local  464      R(4)            4     3     1        ALC              464,472,481                       
+ FMEAN                      Local  466      R(4)            4     2     65160                     466,472                           
+ FPROB                      Local  478      R(4)            4     3     1        ALC              478,481,483                       
+ FSPRE                      Local  470      R(4)            4     2     65160                     470,472,474                       
+ FSUM                       Local  462      R(4)            4     2     65160                     462,464,466                       
+ I                          Local  456      I(4)            4           scalar                                                      
+ J                          Local  456      I(4)            4           scalar                                                      
+ K                          Local  456      I(4)            4           scalar                                                      
+ M                          Local  456      I(4)            4           scalar                    463,464,471,472,480,481           
+ N                          Local  456      I(4)            4           scalar                    479,481,483                       
+ NNME                       Local  463      I(4)            4           scalar                    463,466,471,474,480,483           
+ NNSC                       Local  479      I(4)            4           scalar                    479                               
+ REAL                       Func   466                                  scalar                    466,474,483                       
+ SCALE                      Local  481      R(4)            4     1     1        ALC              481                               
+ SQRT                       Func   474                                  scalar                    474                               
+
+Page 16          Source Listing                  ENS_STATISTICS
+2021-10-20 02:21                                 nfcombwave_ensemble.f90
+
+    490 !
+    491 !
+    492       subroutine ens_stat1
+    493 !- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+ + + ++
+    494 ! Calculate ensemble statistics only at (one) station.
+    495 !- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+ + + ++
+    496 !
+    497       use ens_common
+    498 !
+    499 !  local
+    500 !
+    501       integer :: i,j,k
+    502       real    :: gsum
+    503 !
+    504 !- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+ + + ++
+    505 !
+    506 !  mean.
+    507 !
+    508       gsum = 0.0
+    509       do i=1,nnme
+    510         gsum = gsum + g(i)
+    511       enddo
+    512       gmean = gsum/real(nnme)
+    513 !
+    514 !  spread - deviation.
+    515 !
+    516       gspre = 0.0
+    517       do i=1,nnme
+    518         gspre = gspre + (g(i)-gmean)**2
+    519       enddo
+    520       gspre = sqrt( gspre/real(nnme) )
+    521 !
+    522 !  probability.
+    523 !
+    524      gprob(:) = 0.0
+    525       do i=1,nnsc
+    526         do j=1,nnme
+    527           if( g(j).ge.scale(i) ) gprob(i)=gprob(i)+1.
+    528         enddo     
+    529         gprob(i) = gprob(i)/real(nnme)
+    530       enddo     
+    531 !
+    532 !- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+ + + ++
+    533 !
+    534       return
+    535       end
+
+Page 17          Source Listing                  ENS_STAT1
+2021-10-20 02:21 Entry Points                    nfcombwave_ensemble.f90
+
+
+
+ENTRY POINTS
+
+  Name                  
+                        
+ ens_stat1_             
+
+
+SYMBOL CROSS REFERENCE
+
+ Name                       Object Declared Type            Bytes Dimen Elements Attributes       References                        
+                                                                                                                                    
+ ENS_COMMON                 Module 497                                                            497                               
+ ENS_STAT1                  Subr   492                                                                                              
+ G                          Local  510      R(4)            4     1     1        ALC              510,518,527                       
+ GMEAN                      Local  512      R(4)            4           scalar                    512,518                           
+ GPROB                      Local  524      R(4)            4     1     1        ALC              524,527,529                       
+ GSPRE                      Local  516      R(4)            4           scalar                    516,518,520                       
+ GSUM                       Local  502      R(4)            4           scalar                    508,510,512                       
+ I                          Local  501      I(4)            4           scalar                    509,510,517,518,525,527,529       
+ J                          Local  501      I(4)            4           scalar                    526,527                           
+ K                          Local  501      I(4)            4           scalar                                                      
+ NNME                       Local  509      I(4)            4           scalar                    509,512,517,520,526,529           
+ NNSC                       Local  525      I(4)            4           scalar                    525                               
+ REAL                       Func   512                                  scalar                    512,520,529                       
+ SCALE                      Local  527      R(4)            4     1     1        ALC              527                               
+ SQRT                       Func   520                                  scalar                    520                               
+
+Page 18          Source Listing                  ENS_STAT1
+2021-10-20 02:21                                 nfcombwave_ensemble.f90
+
+    536 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - --+ + + ++
+
+Page 19          Source Listing                  ENS_STAT1
+2021-10-20 02:21 Subprograms/Common Blocks       nfcombwave_ensemble.f90
+
+
+
+SUBPROGRAMS/COMMON BLOCKS
+
+ Name                       Object Declared Type            Bytes Dimen Elements Attributes       References                        
+                                                                                                                                    
+ ENS_COMMON                 Module 3                                                                                                
+ ENS_STAT1                  Subr   492                                                                                              
+ ENS_STATISTICS             Subr   436                                                                                              
+ NFCOMB_MAIN                Prog   56                                                                                               
+ READ_BUOY                  Subr   296                                                                                              
+
+COMPILER OPTIONS BEING USED
+
+       -align noall                          -align nonone
+       -align nocommons                      -align nodcommons
+       -align noqcommons                     -align nozcommons
+       -align records                        -align nosequence
+       -align norec1byte                     -align norec2byte
+       -align norec4byte                     -align norec8byte
+       -align norec16byte                    -align norec32byte
+       -align norec64byte                    -align noarray8byte
+       -align noarray16byte                  -align noarray32byte
+       -align noarray64byte                  -align noarray128byte
+       -align noarray256byte                 -altparam
+       -assume accuracy_sensitive            -assume nobscc
+       -assume nobuffered_io                 -assume nobuffered_stdout
+       -assume nobyterecl                    -assume nocontiguous_assumed_shape
+       -assume nocontiguous_pointer          -assume nocc_omp
+       -assume nocstring                     -assume nodummy_aliases
+       -assume nofpe_summary                 -assume noieee_fpe_flags
+       -assume nominus0                      -assume noold_boz
+       -assume old_complex_align             -assume old_unit_star
+       -assume old_inquire_recl              -assume old_ldout_format
+       -assume old_ldout_zero                -assume noold_logical_assign
+       -assume noold_logical_ldio            -assume old_maxminloc
+       -assume old_xor                       -assume noprotect_allocates
+       -assume protect_constants             -assume noprotect_parens
+       -assume split_common                  -assume source_include
+       -assume nostd_intent_in               -assume std_minus0_rounding
+       -assume nostd_mod_proc_name           -assume std_value
+       -assume realloc_lhs                   -assume underscore
+       -assume no2underscores                -assume norecursion
+       -auto                            no   -auto_scalar
+  no   -bintext                              -ccdefault default
+       -check noarg_temp_created             -check noassume
+       -check nobounds                       -check nocontiguous
+       -check noformat                       -check nooutput_conversion
+       -check nooverflow                     -check nopointers
+       -check noshape                        -check nostack
+       -check nouninitialized                -check noudio_iostat
+       -coarray-num-procs 0             no   -coarray-config-file
+       -convert native                       -cross_reference
+       -D __INTEL_COMPILER=1910              -D __INTEL_COMPILER_UPDATE=3
+       -D __unix__                           -D __unix
+       -D __linux__                          -D __linux
+       -D __gnu_linux__                      -D unix
+
+Page 20          Source Listing                  ENS_STAT1
+2021-10-20 02:21                                 nfcombwave_ensemble.f90
+
+       -D linux                              -D __ELF__
+       -D __x86_64                           -D __x86_64__
+       -D __amd64                            -D __amd64__
+       -D __INTEL_COMPILER_BUILD_DATE=20200925       -D __INTEL_OFFLOAD
+       -D __MMX__                            -D __SSE__
+       -D __SSE_MATH__                       -D __SSE2__
+       -D __SSE2_MATH__                      -D __SSE3__
+       -D __SSSE3__                          -D __SSE4_1__
+       -D __SSE4_2__                         -D __POPCNT__
+       -D __PCLMUL__                         -D __AES__
+       -D __AVX__                            -D __F16C__
+       -D __AVX_I__                          -D __RDRND__
+       -D __FMA__                            -D __FP_FAST_FMA
+       -D __FP_FAST_FMAF                     -D __BMI__
+       -D __LZCNT__                          -D __AVX2__
+       -D __ADX__                            -D __RDSEED__
+       -D __SHA__                            -D __CLWB__
+       -D __RDPID__                          -D __CRAY_X86_ROME
+       -D __CRAYXT_COMPUTE_LINUX_TARGET       -double_size 64
+  no   -d_lines                         no   -Qdyncom
+       -error_limit 30                  no   -f66
+  no   -f77rtl                          no   -fast
+       -fpscomp nofilesfromcmd               -fpscomp nogeneral
+       -fpscomp noioformat                   -fpscomp noldio_spacing
+       -fpscomp nologicals              no   -fpconstant
+       -fpe3                                 -fprm nearest
+  no   -ftz                                  -fp_model noprecise
+       -fp_model fast                        -fp_model nostrict
+       -fp_model nosource                    -fp_model nodouble
+       -fp_model noextended                  -fp_model novery_fast
+       -fp_model noexcept                    -fp_model nono_except
+       -heap_arrays 0                   no   -threadprivate_compat
+       -free                                 -g0
+       -iface nomixed_str_len_arg            -iface nono_mixed_str_len_arg
+       -init noarrays                        -init nohuge
+       -init noinfinity                      -init nominus_huge
+       -init nominus_infinity                -init nominus_tiny
+       -init nonan                           -init nosnan
+       -init notiny                          -init nozero
+  no   -intconstant                          -integer_size 32
+  no   -mixed_str_len_arg               no   -module
+       -names lowercase                 no   -noinclude
+  no   -o                                    -offload-build=host
+       -openmp-simd                          -O2
+  no   -pad_source                           -real_size 32
+  no   -recursive                            -reentrancy threaded
+       -vec=simd                             -show nofullpath
+       -show noinclude                       -show map
+       -show options                    no   -syntax_only
+  no   -threadcom                       no   -U
+  no   -vms                                  -w noall
+       -w nonone                             -w alignments
+       -w nodeclarations                     -w noexternals
+       -w general                            -w noignore_bounds
+       -w noignore_loc                       -w nointerfaces
+       -w noshape                            -w notruncated_source
+       -w uncalled                           -w uninitialized
+
+Page 21          Source Listing                  ENS_STAT1
+2021-10-20 02:21                                 nfcombwave_ensemble.f90
+
+       -w nounused                           -w usage
+  no   -wrap-margins
+
+       -includepath : /pe/intel/compilers_and_libraries_2020.4.304/linux/pstl/stdlib/,/usr/lib64/gcc/x86_64-suse-linux/7/include/,
+           .f,./.f,/pe/intel/compilers_and_libraries_2020.4.304/linux/ipp/include/.f,/pe/intel/compilers_and_libraries_2020.4.304/linux/mkl/include/.f,
+           /pe/intel/compilers_and_libraries_2020.4.304/linux/pstl/include/.f,/pe/intel/compilers_and_libraries_2020.4.304/linux/pstl/stdlib/.f,
+           /pe/intel/compilers_and_libraries_2020.4.304/linux/tbb/include/.f,/pe/intel/compilers_and_libraries_2020.4.304/linux/compiler/include/intel64/.f,
+           /pe/intel/compilers_and_libraries_2020.4.304/linux/compiler/include/icc/.f,/pe/intel/compilers_and_libraries_2020.4.304/linux/compiler/include/.f,
+           /usr/lib64/gcc/x86_64-suse-linux/7/include/.f,/usr/lib64/gcc/x86_64-suse-linux/7/include-fixed/.f,/usr/include/.f,
+           /usr/include/.f,/usr/include/.f
+       -list filename : nfcombwave_ensemble.lst
+  no   -o
+
+COMPILER: Intel(R) Fortran 19.1-1655

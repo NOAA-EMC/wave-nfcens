@@ -1,0 +1,89 @@
+#PBS -N wave_nfcens_gempak_000
+#PBS -j oe
+#PBS -o /lfs/h2/emc/vpppg/noscrub/Bhavani.Rajan/test/wave_nfcens.v1.2.0/gempak.o
+#PBS -e /lfs/h2/emc/vpppg/noscrub/Bhavani.Rajan/test/wave_nfcens.v1.2.0/gempak.e
+#PBS -S /bin/bash
+#PBS -q dev
+#PBS -A WAVE-DEV
+#PBS -l walltime=00:30:00
+#PBS -l select=1:ncpus=1:mem=2500MB
+
+export model=wave_nfcens
+
+# EXPORT list here
+set -x
+
+export cyc=%CYC%
+
+# CALL executable job script here
+
+VERFILE=/lfs/h2/emc/vpppg/noscrub/Bhavani.Rajan/test/wave_nfcens.v1.3.0/versions
+. $VERFILE/run.ver
+
+module purge
+module load envvar/${envvar_ver}
+module load cray-mpich/${cray_mpich_ver}
+module load cfp/${cfp_ver}
+module load intel/${inter_ver}
+module load libjpeg/${libjpeg_ver}
+module load wgrib2/${wgrib2_ver}
+module load grib_util/${grib_util_ver}
+module load util_shared/${util_shared_ver}
+module load gempak/${gempak_ver}
+
+export cyc=00
+  export YMD=20211109
+  export YMDH=${YMD}${cyc}
+  export tcycz=t${cyc}z
+
+  export grdID='glo_30m'
+
+
+  export grdID='glo_30m'
+  export gridID=global.0p25
+
+  export model=gefs.wave
+export SENDCOM=NO
+export SENDDBN=NO
+export jobid=jwave_nfcens_${cyc}
+export NWROOT=/lfs/h2/emc/vpppg/noscrub/Bhavani.Rajan/test
+export PACKAGEROOT=/lfs/h2/emc/vpppg/noscrub/Bhavani.Rajan/test/
+export DATAROOT=/lfs/h2/emc/ptmp/Bhavani.Rajan/DATATEST
+export COMROOT=/lfs/h2/emc/ptmp/Bhavani.Rajan/DATATEST
+
+#Need this to recreate Dell run times!
+export OMP_NUM_THREADS=1
+
+
+#CALL executable job script here
+
+rm gempak.out; touch gempak.out
+echo `date` > gempak.out
+${NWROOT}/wave_nfcens.${wave_nfcens_ver}/jobs/JWAVE_NFCENS_GEMPAK
+echo `date` >> gempak.out
+
+
+exit
+
+if [ $? -ne 0 ]; then
+  ecflow_client --msg="***JOB ${SMSNAME} ERROR RUNNING J-SCRIPT ***"
+  ecflow_client --abort
+  exit
+fi
+
+%include <tail.h>
+%manual
+######################################################################
+# Purpose: Post-processing GEMPAK grids for NCEP.FNMOC COMBINED
+#    WAVE ENSEMBLE
+#
+######################################################################
+
+######################################################################
+# Job specific troubleshooting instructions:
+#  see generic troubleshoot manual page
+#
+######################################################################
+
+# include manual page below
+%end

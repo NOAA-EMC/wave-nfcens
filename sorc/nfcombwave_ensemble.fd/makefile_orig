@@ -1,0 +1,58 @@
+SHELL=/bin/sh
+#
+SRCS=	grbit2.f90  nfcombwave_ensemble.f90
+OBJS=	 grbit2.o  nfcombwave_ensemble.o
+
+# Tunable parameters
+#
+# FC		Name of the fortran compiling system to use
+# LDFLAGS	Flags to the loader
+# LIBS		List of libraries
+# CMD		Name of the executable
+# PROFLIB	Library needed for profiling
+#
+#----- used with XLF on AIX  ---
+FC =            ftn
+FFLAGS =        -O -xHost -list -auto 
+#-I $(INC)
+#--------------------------------
+
+LDFLAGS = 
+#-O -xHost -list -auto -convert big_endian -assume byterecl 
+#INC = /nwprod/lib/incmod/g2_4
+LIBS =          $(G2_LIB4) $(W3NCO_LIB4) $(BACIO_LIB4) $(JASPER_LIB) $(PNG_LIB) $(Z_LIB)
+
+CMD =   nfcombwave_ensemble	
+PROFLIB =  
+
+
+# Lines from here on down should not need to be changed.  They are the
+# actual rules which make uses to build a.out.
+#
+all:		$(CMD)
+
+$(CMD):		$(OBJS)
+	$(FC) $(LDFLAGS) -o $(@) $(OBJS) $(LIBS)
+
+nfcombwave_ensemble.o:	nfcombwave_ensemble.f90
+	$(FC) -c $(FFLAGS) nfcombwave_ensemble.f90
+
+grbit2.o:   grbit2.f90 
+	$(FC) -c $(FFLAGS) grbit2.f90
+
+# Make the profiled version of the command and call it a.out.prof
+#
+$(CMD).prof:	$(OBJS)
+	$(FC) $(LDFLAGS) -o $(@) $(OBJS) $(PROFLIB) $(LIBS)
+
+clean:
+	-rm -f $(OBJS)
+
+clobber:	clean
+	-rm -f $(CMD) $(CMD).prof
+
+void:	clobber
+	-rm -f $(SRCS) makefile
+
+install:
+	mv $(CMD) ../../exec

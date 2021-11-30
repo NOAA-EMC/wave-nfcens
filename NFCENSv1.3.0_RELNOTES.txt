@@ -1,0 +1,128 @@
+Release Notes:  wave_nfcensv1.3.0 - released to NCO on Dec 1 2021
+
+Transition from WCOSS Cray to WCOSS2.
+
+Where is the release tag on subversion/git/vlab?
+
+
+List of external software used (anything outside of your vertical structure),
+including compilers and version numbers for everything. Software used must be
+a minimal list of modules/versions specified per job:
+
+jwave_nfcens
+module load envvar/1.0                  
+module load prod_envir/2.0.5
+module load prod_util/2.0.8
+module load PrgEnv-intel/8.1.0
+module load intel/19.1.3.304
+module load cfp/2.0.4
+module load libjpeg/9c 
+module load wgrib2/2.0.8
+module load grib_util/1.2.2 
+module load util_shared/1.4.0 
+
+
+jwave_nfcens_gempak
+module load envvar/1.0                  
+module load cfp/2.0.4
+module load intel/19.1.3.304
+module load libjpeg/9c 
+module load wgrib2/2.0.8
+module load grib_util/1.2.2 
+module load util_shared/1.4.0 
+module load gempak/7.14.0
+
+List of all code/scripts modified with this release
+
+1. Versions directory added 
+
+2. sorc:
+   build_nfcens.sh
+   sorc/nfcombwave_ensemble.fd: 
+   makefile
+
+3. scripts
+   exwave_nfcens.sh
+   exnawips_nfcens.sh
+
+4. jobs
+   JWAVE_NFCENS
+   JWAVE_NFCENS_GEMPAK
+
+5. ecf
+   jwave_nfcens.ecf
+   jwave_nfcens_gempak.ecf
+
+6. dev 
+   directory is a temperary directory where modified jobs and ecf are for testing;
+   in dev  mode 
+
+
+1. Added a new directory :
+versions :
+build.ver
+run.ver 
+
+2.Under sorc directory: 
+build_nfcens.sh: is modified to use build.ver from versions directory and removed 
+module load/purge from the script
+
+Subdir:nfcombwave_ensemble.fd
+Makefile is completely different from the WCOSS makefile to make accomodations for new path 
+and flags
+
+3. scripts
+Changes were made to EXWAVE_NFCENS and EXNAWIPS_NFCENS to be EE2 complaint and also deleted 
+some commented lines
+And file names were changed from exnawips_nfcens.sh.ecf to exnawips_nfcens.sh
+and exwave_nfcens.sh.ecf to exwave_nfcens.sh
+
+4.jobs
+JWAVE_NFCENS: Removed module load and purge statements and changed the script names inside the job
+JWAVE_NFCENS_GEMPAK: Changed the script names inside the job
+
+5. Added ecf directory in the package (original WCOSS one had it in a different location)
+JWAVE_NFCENS: Added PBS and removed BSUB; added versions file (run.ver); added modules and 
+OMP_NUM_THREADS to make it run faster
+JWAVE_NFCENS_GEMPAK:Added PBS and removed BSUB; added versions file (run.ver); added modules
+
+6. dev: Where the development ecf and jobs are for it to run in dev mode
+
+What changes were made to the above code/scripts to support the new architecture?
+EE2 standards, use of build.ver and run.ver, removing .ecf extension from scripts directory
+
+Were any other changes made that aren’t directly related to the transition?
+No
+
+Are there any changes to incoming data needs or outgoing products?
+No
+
+If output filenames are changing, list the current and new filename
+N/A
+
+Compute resource information, for every job:
+BOth are serial jobs
+
+Compute resource information, for every job:
+Total tasks:1	
+Tasks per node:1
+Serial or parallel or mpmd: serial
+Memory requirements (exclusive or shared): shared
+List any other PBS resource information requirements or MPI tunables
+need to include 
+export export OMP_NUM_THREADS=1 to make "wgrib2" run faster
+
+Runtime changes compared to current production (/gpfs/dell1/nco/ops/com/logs/runtime/daily/* 
+for current stats): Runs within 3 minutes of WCOSS1 time
+ 
+Disk space required per day or per cycle; data retention on disk will remain the same unless otherwise requested.
+Same as before
+
+Dissemination will remain the same unless otherwise communicated to NCO and a PNS/SCN issued
+HPSS archive retention will remain the same unless approval granted by HPCRAC
+Unchanged
+
+What are your up and downstream dependencies?
+Unchanged
+
+

@@ -1,0 +1,481 @@
+Page 1           Source Listing                  GRBIT2
+2021-10-20 02:21                                 grbit2.f90
+
+      1 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+      2 subroutine grbit2 (IFL2,nx,ny,lcgrib,bmp,fld,ierr,ymdc,fhr, &
+      3                                      ensid,nprb,prbid,prblv,nensm) 
+      4 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+      5 !
+      6 ! Generates grib2 output
+      7 !
+      8 ! Vera Gerald, NCEP June 2011
+      9 !
+     10 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+     11 ! Inputs
+     12 !
+     13 !  ensid    - 1, 2 or 3 ; where: 1=mean , 2=spread and 3=probability
+     14 !  nprb     - Total number of probability levels
+     15 !  prbid    - Index of probability value
+     16 !  prblv    - Value of probability threshold
+     17 !  nensm    - number of ensemble members
+     18 !  IFL2     - Unit number for output file 
+     19 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+     20 !
+     21       CHARACTER(len=1) :: cgrib(lcgrib),cin(lcgrib)
+     22       real             :: FLD(nx*ny)
+     23       real             :: coordlist(1)
+     24       integer          :: pds(25),gds(22),parm,ensid,prbid,prblv,nensm
+     25       integer          :: listsec0(3),tmpln 
+     26       integer          :: listsec1(13)
+     27       integer          :: igds(5),igdstmpl(200),ipdstmpl(200)
+     28       integer          :: ymdc,ymd,ym,y4,mm,dd,cc,fhr,yy,cen
+     29       integer          :: nx, ny, nxny, ibfl
+     30       integer          :: ideflist,idefnum
+     31       integer          :: idrstmpl(200)
+     32       Logical*1        :: bmp(nx*ny) 
+     33       character*11     :: envvar
+     34       character(len=80):: g2file
+     35 !
+     36 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+     37 !
+     38 ! Initialize date parameters
+     39 !
+     40       cc = mod(ymdc,100)
+     41       ymd = ymdc/100
+     42       dd = mod(ymd,100)
+     43       ym = ymd/100
+     44       mm = mod(ym,100)
+     45       y4 = ym/100
+     46 !
+     47 !  Create grib message
+     48 !
+     49 !  Initialize new GRIB2 message and pack
+     50 !
+     51 !  Section 0 (Indicator Section) 
+     52 !
+     53        listsec0 = 00
+     54 !
+     55        listsec0(1) = 10 ! Discipline-GRIB Master Table Number (see Code Table 0.0)
+     56        listsec0(2) = 2 ! GRIB Edition Number (currently 2)
+     57        listsec0(3) = 0
+
+Page 2           Source Listing                  GRBIT2
+2021-10-20 02:21                                 grbit2.f90
+
+     58 !
+     59 ! Section 1 (Identification  Section)
+     60 !
+     61        listsec1(1) = 7       ! 7  Id of orginating centre (Common Code Table C-1)
+     62        listsec1(2) = 0 !"EMC"! Id of orginating sub-centre (local table)/Table C/on388
+     63        listsec1(3) = 2       ! GRIB Master Tables Version Number (Code Table 1.0)
+     64        listsec1(4) = 1       !per Brent! GRIB Local Tables Version Number (Code Table 1.
+     65        listsec1(5) = 1       ! Significance of Reference Time (Code Table 1.2)
+     66        listsec1(6) = y4          ! Reference Time - Year (4 digits)
+     67        listsec1(7) = mm          ! Reference Time - Month
+     68        listsec1(8) = dd          ! Reference Time - Day
+     69        listsec1(9) = cc          ! Reference Time - Hour(cycle:0,6,12,18)
+     70        listsec1(10) = 0          ! Reference Time - Minute
+     71        listsec1(11) = 0          ! Reference Time - Second
+     72        listsec1(12) = 0          ! Production status of data (Code Table 1.3)
+     73        listsec1(13) = 1          ! Type of processed data (Code Table 1.4)
+     74 
+     75 !
+     76       call gribcreate(cgrib,lcgrib,listsec0,listsec1,ierr)
+     77       if (ierr.ne.0) then
+     78         write(6,*) ' ERROR creating new GRIB2 field = ',ierr
+     79         return
+     80       endif
+     81 !
+     82 !  Section 3 (Grid Definition Section) 
+     83 !
+     84 
+     85         nxny = nx * ny           ! NI # rows(lat) & NJ # rows long
+     86 !
+     87            igds = 00
+     88 !
+     89            igds(1) = 0                  !Source of grid definition (see Code Table 3.0)
+     90            igds(2) = nxny              ! num of grid points
+     91            igds(3) = 0                  !Number of octets needed for each additional grid points dfn
+     92            igds(4) = 0                  !Interpretation of list for optional points definition (Code Table 3.11)
+     93            igds(5) = 0                  !Grid Definition Template Number (Code Table 3.1)
+     94 !
+     95            idefnum = 0
+     96            ideflist=0       !Used if igds(3) .ne. 0. Dummy array otherwise
+     97 !
+     98         igdstmpl = 00
+     99 !
+    100            igdstmpl(1) = 6    !Earth assumed spherical with radius of 6,371,229.0m 
+    101            igdstmpl(2) = 0    !
+    102            igdstmpl(3) = 0
+    103            igdstmpl(4) = 0
+    104            igdstmpl(5) = 0
+    105            igdstmpl(6) = 0
+    106            igdstmpl(7) = 0
+    107            igdstmpl(8) = nx             ! num points along parallel
+    108            igdstmpl(9) = ny             ! num points along meridian
+    109            igdstmpl(10) = 0
+    110            igdstmpl(11) = 0
+    111            igdstmpl(12) = 90000000      ! lat of first grid point
+    112            igdstmpl(13) = 000           ! long of first grid point
+    113            igdstmpl(14) = 48            ! res and comp flags
+    114            igdstmpl(15) = -90000000     ! lat of last grid point
+
+Page 3           Source Listing                  GRBIT2
+2021-10-20 02:21                                 grbit2.f90
+
+    115            igdstmpl(16) = 359000000     ! long of last grid point
+    116            igdstmpl(17) = 1000000       ! Increment of lat
+    117            igdstmpl(18) = 1000000       ! Increment of long
+    118            igdstmpl(19) = 0            ! scanning mode
+    119            igdstmpl(21) = 0
+    120            igdstmpl(22) = 0
+    121 
+    122 !
+    123       call addgrid(cgrib,lcgrib,igds,igdstmpl,200,ideflist, &
+    124                   idefnum,ierr)
+    125       if (ierr.ne.0) then
+    126         write(6,*) ' ERROR adding GRIB2 grid = ',ierr
+    127         return
+    128       endif
+    129 !
+    130 !  Section 4 - Product Definition Section
+    131 !
+    132 !  Define production template number (4.tmpln)
+    133 !
+    134          if(ensid.eq.3)then
+    135             ipdsnum = 5  ! ensemble for probal template(4.5)
+    136            else
+    137             ipdsnum = 2  ! ensemble spread or mean template(4.2)
+    138          endif
+    139 !
+    140 !  Parameter category (see Code Table 4.1)
+    141 !
+    142        ipdstmpl = 00
+    143 !
+    144         ipdstmpl(1) = 0     ! ocean 
+    145 !
+    146 !    Get parameter number (see Code Table 4.2)
+    147 !
+    148         ipdstmpl(2) = 3  ! Swhgt
+    149 !
+    150 !  Type of generating process: analysis or forecast(see code Table 4.3)
+    151 !  For Wave Model/Forecast fields
+    152 !
+    153         ipdstmpl(3) = 4     ! ensemb
+    154         ipdstmpl(4) = 0     !background generating process identifier
+    155 !                         (defined by originating Center)
+    156         ipdstmpl(5) = 10   ! :analysis or forecast generating process identifier
+    157 !                            (defined by originating Center)
+    158         ipdstmpl(6) = 0     ! hours of observational data cutoff after reference time
+    159         ipdstmpl(7) = 0     ! minutes of observational data cutoff after reference time
+    160         ipdstmpl(8) = 1        !indicator of unit of time range (see Code Table 4.4) 
+    161         ipdstmpl(9) = fhr      !forecast time in units defined by pdstmpl(8)
+    162         ipdstmpl(10) = 1        ! type of level (see Code Table 4.5) 1st level
+    163         ipdstmpl(11) = 0        ! scale factor of pdstmpl(10) 
+    164         ipdstmpl(12) = 0        ! scaled value of pdstmpl(10)
+    165         ipdstmpl(13) = 255   ! type of level (See Code Table 4.5) 2nd level
+    166         ipdstmpl(14) = 0     ! scale factor of ipdstmpl(13)
+    167         ipdstmpl(15) = 0     ! scaled value of ipdstmpl(13)
+    168 !
+    169 !   Choose proper parameters for given ensid (mean, spread or probab)
+    170 !
+    171        if (ensid.eq.1) then       !   ensemble mean
+
+Page 4           Source Listing                  GRBIT2
+2021-10-20 02:21                                 grbit2.f90
+
+    172           ipdstmpl(16) = 0        !
+    173           ipdstmpl(17) = nensm    ! Number of esemble members
+    174        elseif (ensid.eq.2) then   !  ensemble spread
+    175            ipdstmpl(16) = 4
+    176            ipdstmpl(17) = nensm   ! Number of ensemble members 
+    177        elseif (ensid.eq.3) then   ! ensemble probability
+    178             ipdstmpl(16) = prbid  ! Forecast probability number
+    179             ipdstmpl(17) = 8      ! Total number of forecast probabilities 
+    180             ipdstmpl(18) = 1      ! Probability type
+    181             ipdstmpl(19) = 0      ! Scale factor of lower limit
+    182             ipdstmpl(20) = 0      ! Scaled value of lower limit
+    183             ipdstmpl(21) = 2      ! Scale factor of upper limit 
+    184             ipdstmpl(22) = prblv  ! Scaled value of upper limit 
+    185        endif
+    186 !
+    187       numcoord=0
+    188         coordlist= 0.0     !needed for hybrid vertical coordinate
+    189 ! set bitmap flag
+    190         ibfl = 192    ! GDS/BMS FLAG (RIGHT ADJ COPY OF OCTET 8)
+    191         if (btest(ibfl,6)) then
+    192           ibmap=0
+    193         else
+    194           ibmap=255    ! Bitmap indicator ( see Code Table 6.0 )
+    195          bmp=.true.
+    196         endif
+    197       idrsnum=40     ! Data Rep Template Number ( see Code Table 5.0 )/Simple packing
+    198 !
+    199       idrstmpl=0
+    200 !
+    201 !********************************************************************************
+    202 ! idrstmpl(1): reference value(R) (IEEE 32-bit floating-point value)             *
+    203 ! idrstmpl(2): binary scale factor (E)                                           *
+    204 ! idrstmpl(3): decimal scale factor (D)                                          *
+    205 ! idrstmpl(4): number of bits used for each packed value for simple packing      *
+    206 !              or for each group reference value for complex packing or          *
+    207 !              spatial differencing                                              *
+    208 ! idrstmpl(5): type of original field values (See Code Table 5.1)                *
+    209 !********************************************************************************
+    210 !
+    211       idrstmpl(1) = 0
+    212       idrstmpl(2) = 0
+    213  
+    214       idrstmpl(3) = 2       ! binary scale factor (E)
+    215       idrstmpl(4) = 0
+    216       idrstmpl(5) = 0
+    217 !
+    218       call addfield(cgrib,lcgrib,ipdsnum,ipdstmpl,200, &
+    219                    coordlist,numcoord,idrsnum,idrstmpl,200,fld, &
+    220                    nxny,ibmap,bmp,ierr)
+    221       if (ierr.ne.0) then
+    222           write(6,*) ' ERROR adding GRIB2 field = ',ierr
+    223           return
+    224       endif
+    225 !
+    226 !
+    227        print*,'grid2 PDS ',ipdsnum,idrsnum,ipdstmpl(1:25)
+    228 !
+
+Page 5           Source Listing                  GRBIT2
+2021-10-20 02:21                                 grbit2.f90
+
+    229        print*,'grib2 GDS',igds(1:5),igdstmpl(1:22)
+    230 !
+    231 !
+    232 ! End GRIB2 field
+    233 !
+    234       call gribend(cgrib,lcgrib,lengrib,ierr)
+    235       if (ierr.ne.0) then
+    236         write(6,*) ' ERROR ending new GRIB2 message = ',ierr
+    237         return
+    238       endif
+    239       print *,' writing ',lengrib,' bytes...'
+    240        call wryte(ifl2,lengrib,cgrib)
+    241 !
+    242 !..         encode next record
+    243 !
+    244          return
+    245 !
+    246       end
+
+
+ENTRY POINTS
+
+  Name               
+                     
+ grbit2_             
+
+
+SYMBOL CROSS REFERENCE
+
+ Name                       Object Declared Type            Bytes Dimen Elements Attributes       References                        
+                                                                                                                                    
+ ADDFIELD                   Subr   218                                                            218                               
+ ADDGRID                    Subr   123                                                            123                               
+ BMP                        Dummy  2        L(1)            1     1     0        ARG,INOUT        195,220                           
+ BTEST                      Func   191                                  scalar                    191                               
+ CC                         Local  28       I(4)            4           scalar                    40,69                             
+ CEN                        Local  28       I(4)            4           scalar                                                      
+ CGRIB                      Local  21       CHAR            1     1     0                         76,123,218,234,240                
+ CIN                        Local  21       CHAR            1     1     0                                                           
+ COORDLIST                  Local  23       R(4)            4     1     1                         188,219                           
+ DD                         Local  28       I(4)            4           scalar                    42,68                             
+ ENSID                      Dummy  3        I(4)            4           scalar   ARG,INOUT        134,171,174,177                   
+ ENVVAR                     Local  33       CHAR            11          scalar                                                      
+ FHR                        Dummy  2        I(4)            4           scalar   ARG,INOUT        161                               
+ FLD                        Dummy  2        R(4)            4     1     0        ARG,INOUT        219                               
+ G2FILE                     Local  34       CHAR            80          scalar                                                      
+ GDS                        Local  24       I(4)            4     1     22                                                          
+ GRBIT2                     Subr   2                                                                                                
+ GRIBCREATE                 Subr   76                                                             76                                
+ GRIBEND                    Subr   234                                                            234                               
+ IBFL                       Local  29       I(4)            4           scalar                    190,191                           
+ IBMAP                      Local  192      I(4)            4           scalar                    192,194,220                       
+ IDEFLIST                   Local  30       I(4)            4           scalar                    96,123                            
+ IDEFNUM                    Local  30       I(4)            4           scalar                    95,124                            
+ IDRSNUM                    Local  197      I(4)            4           scalar                    197,219,227                       
+ IDRSTMPL                   Local  31       I(4)            4     1     200                       199,211,212,214,215,216,219       
+ IERR                       Dummy  2        I(4)            4           scalar   ARG,INOUT        76,77,78,124,125,126,220,221,222,2
+
+Page 6           Source Listing                  GRBIT2
+2021-10-20 02:21 Symbol Table                    grbit2.f90
+
+ Name                       Object Declared Type            Bytes Dimen Elements Attributes       References                        
+                                                                                                                                    
+                                                                                                  34,235,236                        
+ IFL2                       Dummy  2        I(4)            4           scalar   ARG,INOUT        240                               
+ IGDS                       Local  27       I(4)            4     1     5                         87,89,90,91,92,93,123,229         
+ IGDSTMPL                   Local  27       I(4)            4     1     200                       98,100,101,102,103,104,105,106,107
+                                                                                                  ,108,109,110,111,112,113,114,115,1
+                                                                                                  16,117,118,119,120,123,229        
+ IPDSNUM                    Local  135      I(4)            4           scalar                    135,137,218,227                   
+ IPDSTMPL                   Local  27       I(4)            4     1     200                       142,144,148,153,154,156,158,159,16
+                                                                                                  0,161,162,163,164,165,166,167,172,
+                                                                                                  173,175,176,178,179,180,181,182,18
+                                                                                                  3,184,218,227                     
+ LCGRIB                     Dummy  2        I(4)            4           scalar   ARG,INOUT        21,76,123,218,234                 
+ LENGRIB                    Local  234      I(4)            4           scalar                    234,239,240                       
+ LISTSEC0                   Local  25       I(4)            4     1     3                         53,55,56,57,76                    
+ LISTSEC1                   Local  26       I(4)            4     1     13                        61,62,63,64,65,66,67,68,69,70,71,7
+                                                                                                  2,73,76                           
+ MM                         Local  28       I(4)            4           scalar                    44,67                             
+ MOD                        Func   40                                   scalar                    40,42,44                          
+ NENSM                      Dummy  3        I(4)            4           scalar   ARG,INOUT        173,176                           
+ NPRB                       Dummy  3        I(4)            4           scalar   ARG,INOUT                                          
+ NUMCOORD                   Local  187      I(4)            4           scalar                    187,219                           
+ NX                         Dummy  2        I(4)            4           scalar   ARG,INOUT        22,32,85,107                      
+ NXNY                       Local  29       I(4)            4           scalar                    85,90,220                         
+ NY                         Dummy  2        I(4)            4           scalar   ARG,INOUT        22,32,85,108                      
+ PARM                       Local  24       I(4)            4           scalar                                                      
+ PDS                        Local  24       I(4)            4     1     25                                                          
+ PRBID                      Dummy  3        I(4)            4           scalar   ARG,INOUT        178                               
+ PRBLV                      Dummy  3        I(4)            4           scalar   ARG,INOUT        184                               
+ TMPLN                      Local  25       I(4)            4           scalar                                                      
+ WRYTE                      Subr   240                                                            240                               
+ Y4                         Local  28       I(4)            4           scalar                    45,66                             
+ YM                         Local  28       I(4)            4           scalar                    43,44,45                          
+ YMD                        Local  28       I(4)            4           scalar                    41,42,43                          
+ YMDC                       Dummy  2        I(4)            4           scalar   ARG,INOUT        40,41                             
+ YY                         Local  28       I(4)            4           scalar                                                      
+
+Page 7           Source Listing                  GRBIT2
+2021-10-20 02:21 Subprograms/Common Blocks       grbit2.f90
+
+
+
+SUBPROGRAMS/COMMON BLOCKS
+
+ Name                       Object Declared Type            Bytes Dimen Elements Attributes       References                        
+                                                                                                                                    
+ GRBIT2                     Subr   2                                                                                                
+
+COMPILER OPTIONS BEING USED
+
+       -align noall                          -align nonone
+       -align nocommons                      -align nodcommons
+       -align noqcommons                     -align nozcommons
+       -align records                        -align nosequence
+       -align norec1byte                     -align norec2byte
+       -align norec4byte                     -align norec8byte
+       -align norec16byte                    -align norec32byte
+       -align norec64byte                    -align noarray8byte
+       -align noarray16byte                  -align noarray32byte
+       -align noarray64byte                  -align noarray128byte
+       -align noarray256byte                 -altparam
+       -assume accuracy_sensitive            -assume nobscc
+       -assume nobuffered_io                 -assume nobuffered_stdout
+       -assume nobyterecl                    -assume nocontiguous_assumed_shape
+       -assume nocontiguous_pointer          -assume nocc_omp
+       -assume nocstring                     -assume nodummy_aliases
+       -assume nofpe_summary                 -assume noieee_fpe_flags
+       -assume nominus0                      -assume noold_boz
+       -assume old_complex_align             -assume old_unit_star
+       -assume old_inquire_recl              -assume old_ldout_format
+       -assume old_ldout_zero                -assume noold_logical_assign
+       -assume noold_logical_ldio            -assume old_maxminloc
+       -assume old_xor                       -assume noprotect_allocates
+       -assume protect_constants             -assume noprotect_parens
+       -assume split_common                  -assume source_include
+       -assume nostd_intent_in               -assume std_minus0_rounding
+       -assume nostd_mod_proc_name           -assume std_value
+       -assume realloc_lhs                   -assume underscore
+       -assume no2underscores                -assume norecursion
+       -auto                            no   -auto_scalar
+  no   -bintext                              -ccdefault default
+       -check noarg_temp_created             -check noassume
+       -check nobounds                       -check nocontiguous
+       -check noformat                       -check nooutput_conversion
+       -check nooverflow                     -check nopointers
+       -check noshape                        -check nostack
+       -check nouninitialized                -check noudio_iostat
+       -coarray-num-procs 0             no   -coarray-config-file
+       -convert native                       -cross_reference
+       -D __INTEL_COMPILER=1910              -D __INTEL_COMPILER_UPDATE=3
+       -D __unix__                           -D __unix
+       -D __linux__                          -D __linux
+       -D __gnu_linux__                      -D unix
+       -D linux                              -D __ELF__
+       -D __x86_64                           -D __x86_64__
+       -D __amd64                            -D __amd64__
+       -D __INTEL_COMPILER_BUILD_DATE=20200925       -D __INTEL_OFFLOAD
+
+Page 8           Source Listing                  GRBIT2
+2021-10-20 02:21                                 grbit2.f90
+
+       -D __MMX__                            -D __SSE__
+       -D __SSE_MATH__                       -D __SSE2__
+       -D __SSE2_MATH__                      -D __SSE3__
+       -D __SSSE3__                          -D __SSE4_1__
+       -D __SSE4_2__                         -D __POPCNT__
+       -D __PCLMUL__                         -D __AES__
+       -D __AVX__                            -D __F16C__
+       -D __AVX_I__                          -D __RDRND__
+       -D __FMA__                            -D __FP_FAST_FMA
+       -D __FP_FAST_FMAF                     -D __BMI__
+       -D __LZCNT__                          -D __AVX2__
+       -D __ADX__                            -D __RDSEED__
+       -D __SHA__                            -D __CLWB__
+       -D __RDPID__                          -D __CRAY_X86_ROME
+       -D __CRAYXT_COMPUTE_LINUX_TARGET       -double_size 64
+  no   -d_lines                         no   -Qdyncom
+       -error_limit 30                  no   -f66
+  no   -f77rtl                          no   -fast
+       -fpscomp nofilesfromcmd               -fpscomp nogeneral
+       -fpscomp noioformat                   -fpscomp noldio_spacing
+       -fpscomp nologicals              no   -fpconstant
+       -fpe3                                 -fprm nearest
+  no   -ftz                                  -fp_model noprecise
+       -fp_model fast                        -fp_model nostrict
+       -fp_model nosource                    -fp_model nodouble
+       -fp_model noextended                  -fp_model novery_fast
+       -fp_model noexcept                    -fp_model nono_except
+       -heap_arrays 0                   no   -threadprivate_compat
+       -free                                 -g0
+       -iface nomixed_str_len_arg            -iface nono_mixed_str_len_arg
+       -init noarrays                        -init nohuge
+       -init noinfinity                      -init nominus_huge
+       -init nominus_infinity                -init nominus_tiny
+       -init nonan                           -init nosnan
+       -init notiny                          -init nozero
+  no   -intconstant                          -integer_size 32
+  no   -mixed_str_len_arg               no   -module
+       -names lowercase                 no   -noinclude
+  no   -o                                    -offload-build=host
+       -openmp-simd                          -O2
+  no   -pad_source                           -real_size 32
+  no   -recursive                            -reentrancy threaded
+       -vec=simd                             -show nofullpath
+       -show noinclude                       -show map
+       -show options                    no   -syntax_only
+  no   -threadcom                       no   -U
+  no   -vms                                  -w noall
+       -w nonone                             -w alignments
+       -w nodeclarations                     -w noexternals
+       -w general                            -w noignore_bounds
+       -w noignore_loc                       -w nointerfaces
+       -w noshape                            -w notruncated_source
+       -w uncalled                           -w uninitialized
+       -w nounused                           -w usage
+  no   -wrap-margins
+
+       -includepath : /pe/intel/compilers_and_libraries_2020.4.304/linux/pstl/stdlib/,/usr/lib64/gcc/x86_64-suse-linux/7/include/,
+
+Page 9           Source Listing                  GRBIT2
+2021-10-20 02:21                                 grbit2.f90
+
+           .f,./.f,/pe/intel/compilers_and_libraries_2020.4.304/linux/ipp/include/.f,/pe/intel/compilers_and_libraries_2020.4.304/linux/mkl/include/.f,
+           /pe/intel/compilers_and_libraries_2020.4.304/linux/pstl/include/.f,/pe/intel/compilers_and_libraries_2020.4.304/linux/pstl/stdlib/.f,
+           /pe/intel/compilers_and_libraries_2020.4.304/linux/tbb/include/.f,/pe/intel/compilers_and_libraries_2020.4.304/linux/compiler/include/intel64/.f,
+           /pe/intel/compilers_and_libraries_2020.4.304/linux/compiler/include/icc/.f,/pe/intel/compilers_and_libraries_2020.4.304/linux/compiler/include/.f,
+           /usr/lib64/gcc/x86_64-suse-linux/7/include/.f,/usr/lib64/gcc/x86_64-suse-linux/7/include-fixed/.f,/usr/include/.f,
+           /usr/include/.f,/usr/include/.f
+       -list filename : grbit2.lst
+  no   -o
+
+COMPILER: Intel(R) Fortran 19.1-1655
