@@ -11,3 +11,4 @@ export util_shared_ver=1.4.0
 export gempak_ver=7.14.0
 export PrgEnv_intel_ver=8.1.0
 export libjpeg_ver=9c
+export gefs_ver=12.1.0
