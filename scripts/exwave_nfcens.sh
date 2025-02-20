@@ -359,7 +359,7 @@
 
     set $setoff
 
-    export maillist='ncep.list.spa-helpdesk@noaa.gov,sdm@noaa,ncep.sos@noaa.gov,Henrique.Alves@noaa.gov'
+    export MAILTO=${MAILTO:-'nco.spa@noaa.gov,nco.sos@noaa.gov,ncep.sos@noaa.gov,bhavani.balasubramaniyan@noaa.gov'}
     echo ' ' > warning
     echo '******************************************************' >> warning
     echo '*** WARNING !! COULD NOT FIND FNMOC ENSEMBLES DATA ***' >> warning
@@ -369,7 +369,7 @@
     echo 'NCEP-FNMOC COMBINED WAVE ENSEMBLE WILL RUN WITH ONLY NCEP MEMBERS' >> warning
     echo "$modID $grdID prep $date $cycle : FNMOC file(s) missing (using only NCEP)" >> $wavelog
    
-    #XXX cat warning |mail.py -v -s "Missing FNMOC Ensemble Data For $PDY t${cyc}z" $maillist
+    #XXX cat warning |mail.py -v -s "Missing FNMOC Ensemble Data For $PDY t${cyc}z" $MAILTO
     
 
   fi
@@ -499,13 +499,13 @@
   then
     for dbmemb in `seq -w 0 $((${nmembm1}-1))`
     do
-       $DBNROOT/bin/dbn_alert MODEL NFC_WAVEENS $job $COMOUT/HTSGW_${dbmemb}.t${cyc}z.grib2
+       $SIPHONROOT/bin/dbn_alert MODEL NFC_WAVEENS $job $COMOUT/HTSGW_${dbmemb}.t${cyc}z.grib2
     done
-       $DBNROOT/bin/dbn_alert MODEL NFC_WAVEENS $job $COMOUT/HTSGW_mean.t${cyc}z.grib2
-       $DBNROOT/bin/dbn_alert MODEL NFC_WAVEENS $job $COMOUT/HTSGW_spread.t${cyc}z.grib2
-       $DBNROOT/bin/dbn_alert MODEL NFC_WAVEENS $job $COMOUT/HTSGW_probab.t${cyc}z.grib2
-       $DBNROOT/bin/dbn_alert MODEL NFC_WAVEENS $job $COMOUT/HTSGW_station.t${cyc}z.text.gz
-       $DBNROOT/bin/dbn_alert MODEL NFC_WAVEENS $job $COMOUT/what_wave${modID}_used.${cycle}
+       $SIPHONROOT/bin/dbn_alert MODEL NFC_WAVEENS $job $COMOUT/HTSGW_mean.t${cyc}z.grib2
+       $SIPHONROOT/bin/dbn_alert MODEL NFC_WAVEENS $job $COMOUT/HTSGW_spread.t${cyc}z.grib2
+       $SIPHONROOT/bin/dbn_alert MODEL NFC_WAVEENS $job $COMOUT/HTSGW_probab.t${cyc}z.grib2
+       $SIPHONROOT/bin/dbn_alert MODEL NFC_WAVEENS $job $COMOUT/HTSGW_station.t${cyc}z.text.gz
+       $SIPHONROOT/bin/dbn_alert MODEL NFC_WAVEENS $job $COMOUT/what_wave${modID}_used.${cycle}
   fi
 #
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - --+ + + ++

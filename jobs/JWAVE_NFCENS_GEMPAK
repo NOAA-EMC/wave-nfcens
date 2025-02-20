@@ -8,12 +8,9 @@ set -xa
 # #### 08/25/1999 ###################
 # SET SHELL PROCESSING VARIABLES
 # ###################################
-export PS4='$SECONDS + ' 
+export PS4='+ $SECONDS + ' 
 date
-# 
 
-#
-export pid=$$
 export DATA=${DATA:-${DATAROOT:?}/${jobid}}
 if [ ! -d $DATA ]
 then
@@ -33,8 +30,6 @@ export cycle=t${cyc}z
 ####################################
 export pgmout="OUTPUT.$$"
 
-export MP_PULSE=0
-
 export SENDCOM=${SENDCOM:-YES}
 export SENDDBN=${SENDDBN:-YES}
 export SENDECF=${SENDECF:-YES}
@@ -45,24 +40,18 @@ export sigMODE=post # Only post-processing done here, but may need to be revised
 # Path to HOME Directory
 ####################################
 
-export HOMEwave=${HOMEwave:-${NWROOT}/wave_nfcens.${wave_nfcens_ver}}
+export HOMEwave=${HOMEwave_nfcens}
 export GEMwave=${GEMwave:-$HOMEwave/gempak}
 export FIXwave=${FIXwave:-HOMEwave/fix}
 
-####################################
-# load modules
-####################################
-# module use ${HOMEwave}/modulefiles
-# module load runtime_nfcens.modules
-
 # Run setpdy and initialize PDY variables
 sh setpdy.sh
-. PDY
+. ./PDY
 
 #
 # Set up model and cycle specific variables
 #
-export NET=wave
+export NET=wave_nfcens
 export RUN=nfcens
 export fend=00
 export finc=1
@@ -71,13 +60,11 @@ export GRIB=grib
 export EXT=""
 export DBN_ALERT_TYPE=NFC_WAVEENS_GEMPAK
 
-export COMROOT=${COMROOT:-$(compath.py ${envir}/com/${NET}/${wave_nfcens_ver})}
-export COMIN=${COMIN:-${COMROOT}/${RUN}.${PDY}}
-export COMOUT=${COMOUT:-${COMROOT}/${RUN}.${PDY}/gempak}
+export COMIN=${COMIN:-$(compath.py ${NET}/${wave_nfcens_ver}/${RUN}).${PDY}}
+export COMOUT=${COMOUT:-$(compath.py -o ${NET}/${wave_nfcens_ver})/${RUN}.${PDY}}
+export COMOUTgempak=${COMOUTgempak:-${COMOUT}/gempak}
 
-if [ ! -f $COMOUT ] ; then
-  mkdir -p -m 775 $COMOUT
-fi
+mkdir -p -m 775 $COMOUT $COMOUTgempak
 
 #######################
 # Copy job specific GEMPAK table for FNMOC grib2 files
