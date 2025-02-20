@@ -12,14 +12,9 @@ set -xa
 # #### 05/04/99 #####################
 # SET WAVE SHELL PROCESSING VARIABLES
 # ###################################
-export PS4='$SECONDS + '
+export PS4='+ $SECONDS + '
 date
 
-#
-# obtain unique process id (pid) and make temp directory
-#
-export pid=$$
-#
 # Default is YES. Change to NO to run with only NCEP members
 export RUN_FNMOC=${RUN_FNMOC:-YES}
 
@@ -39,13 +34,10 @@ cd $DATA
 
 export cycle=t${cyc}z 
 
-
 ####################################
 # Determine Job Output Name on System
 ####################################
 export pgmout="OUTPUT.$$"
-
-export MP_PULSE=0
 
 export SENDCOM=${SENDCOM:-YES}
 export SENDDBN=${SENDDBN:-YES}
@@ -53,7 +45,7 @@ export SENDECF=${SENDECF:-YES}
 
 export sigMODE=post # Only post-processing done here, but may need to be revised by NCO
 
-export NET=wave
+export NET=wave_nfcens
 export RUN=nfcens
 export gridID=${gridID:-'global.0p25'}
 export END_HOUR=${END_HOUR:-240}  
@@ -74,30 +66,24 @@ export fnmID=ENSEMBLE.halfDegree.OCN.fcst  # FNMOC model ID
 # Path to HOME Directory
 ####################################
 
-export HOMEwave=${HOMEwave:-$NWROOT/wave_nfcens.${wave_nfcens_ver}}
-export CODEwave=${CODEwave:-$NWROOT/${NET}_code.$code_ver}
-
+export HOMEwave=${HOMEwave_nfcens}
 export EXECwave=${EXECwave:-$HOMEwave/exec}
 export FIXwave=${FIXwave:-$HOMEwave/fix}
 
 ####################################
 # load modules
 ####################################
-#module use ${HOMEwave}/modulefiles
-#module load runtime_nfcens.modules
-
 # Set PDY
 sh setpdy.sh
-. PDY
+. ./PDY
 
 ###################################
 # Set COM Paths
 ###################################
-export COMROOT=${COMROOT:-$(compath.py ${envir}/com/${NET}/${wave_nfcens_ver})}
-##export COMIN=${COMIN:-$(compath.py gefs/prod/gefs).${PDY}/${cyc}/wave/gridded}
-export COMIN=${COMIN:-$(compath.py ${envir}/com/gefs/${gefs_ver}/gefs).${PDY}/${cyc}/wave/gridded}
+export COMINgefs=${COMINgefs:-$(compath.py gefs/${gefs_ver})/gefs.${PDY}/${cyc}/wave/gridded}
+export COMIN=${COMIN:-$COMINgefs}
 export COMFN=${COMFN:-$DCOMROOT/${PDY}/wgrbbul/fnmoc_ocn_ens_0p5_gb2} # Directory for incoming FNMOC data
-export COMOUT=${COMOUT:-${COMROOT}/${RUN}.${PDY}}
+export COMOUT=${COMOUT:-$(compath.py -o ${NET}/${wave_nfcens_ver})/${RUN}.${PDY}}
 
 mkdir -p ${COMOUT}
 
@@ -108,7 +94,6 @@ env
 ###################################
 # Execute the Script
 ###################################
-
 $HOMEwave/scripts/exwave_nfcens.sh
 
 export err=$?; err_chk
@@ -116,9 +101,9 @@ export err=$?; err_chk
 msg="JOB $job HAS COMPLETED NORMALLY."
 postmsg $jlogfile "$msg"
 
-f [ -e "$pgmout" ]; then
+if [ -e "$pgmout" ]; then
   cat $pgmout
-  fi
+fi
 
 
 ###################################

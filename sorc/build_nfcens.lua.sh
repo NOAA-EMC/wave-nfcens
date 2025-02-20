@@ -8,19 +8,16 @@
 ###############################################################################
 #
 # --------------------------------------------------------------------------- #
+set -x
 
-# Load modulefile
-#  module purge
-#  module use ../modulefiles_wave_nfcens
-#  module load build_gwes_sorc.module  
-#  module list
 source ../versions/build.ver
+module reset
+module use `pwd`
+module load build-wave_nfcens.module.lua
+module list
 
 outfile=`pwd`/make.all.out
 rm -f ${outfile}
-
-module purge
-source ../modulefiles/build_waves_nfcens.module
 
 # 1. Preparations: seek source codes to be compiled
 

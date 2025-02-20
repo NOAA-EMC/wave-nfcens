@@ -1,3 +1,4 @@
+#!/bin/sh
 ###################################################################
 #### "----------------------------------------------------"
 #### "exnawips - convert NCEP GRIB files into GEMPAK Grids"
@@ -102,8 +103,6 @@ do
 
   cp $GRIBIN grib_${memb}
 
-  startmsg
-
   $NAGRIB << EOF
    GBFILE   = grib_${memb}
    INDXFL   = 
@@ -137,13 +136,13 @@ EOF
   fi
 
   if [ $SENDCOM = "YES" ] ; then
-     cpfs $GEMGRD $COMOUT/$GEMGRD
+     cpfs $GEMGRD $COMOUTgempak/$GEMGRD
      if [ $SENDDBN = "YES" ] ; then
-         $DBNROOT/bin/dbn_alert MODEL ${DBN_ALERT_TYPE} $job \
-           $COMOUT/$GEMGRD
+         $SIPHONROOT/bin/dbn_alert MODEL ${DBN_ALERT_TYPE} $job \
+           $COMOUTgempak/$GEMGRD
      else
        set +x
-       echo "##### DBN_ALERT is: MODEL ${DBN_ALERT_TYPE} $job $COMOUT/$GEMGRD#####"
+       echo "##### DBN_ALERT is: MODEL ${DBN_ALERT_TYPE} $job $COMOUTgempak/$GEMGRD#####"
        [[ "$LOUD" = YES ]] && set -x
      fi
   fi
@@ -154,9 +153,9 @@ done
 #####################################################################
 # GOOD RUN
 set +x
-echo "**************JOB $RUN NAWIPS COMPLETED NORMALLY ON THE IBM"
-echo "**************JOB $RUN NAWIPS COMPLETED NORMALLY ON THE IBM"
-echo "**************JOB $RUN NAWIPS COMPLETED NORMALLY ON THE IBM"
+echo "**************JOB $RUN NAWIPS COMPLETED NORMALLY"
+echo "**************JOB $RUN NAWIPS COMPLETED NORMALLY"
+echo "**************JOB $RUN NAWIPS COMPLETED NORMALLY"
 [[ "$LOUD" = YES ]] && set -x
 #####################################################################
 msg='Job completed normally.'

@@ -23,7 +23,7 @@
 # directory are included, so if no exclude patterns match that file, it will be
 # transferred.
 
-com/wave/_ENVIR_/nfcens._PDY_/
+_COMROOT_/wave_nfcens/_SHORTVER_/nfcens._PDY_/
 B 200
 
 
