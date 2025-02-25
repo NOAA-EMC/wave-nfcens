@@ -1,0 +1,27 @@
+#%Module######################################################################
+##                                             Andre.VanderWesthuysen@NOAA.gov
+##                                                    IMSG @ NOAA/NWS/NCEP/EMC
+## wave_glwu
+##_____________________________________________________
+#proc ModulesHelp { } {
+#puts stderr "Set environment for the Wave_NFCENS"
+#puts stderr "This module initializes the environment "
+#puts stderr "for the WCOSS2 Cray implementation of Wave_NFCENS\n"
+#}
+#module-whatis " Waves NFC-ENS whatis description"
+
+set ver ${wave_nfcens_ver}
+
+set sys [uname sysname]
+
+# Loading Intel Compiler Suite
+module load envvar/${envvar_ver}
+module load PrgEnv-intel/${PrgEnv_intel_ver}
+module load craype/${craype_ver}
+module load intel/${intel_ver}
+module load jasper/${jasper_ver}
+module load libpng/${libpng_ver}
+module load zlib/${zlib_ver}
+module load g2/${g2_ver}
+module load w3nco/${w3nco_ver}
+module load bacio/${bacio_ver}
