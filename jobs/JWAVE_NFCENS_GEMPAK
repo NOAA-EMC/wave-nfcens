@@ -25,11 +25,6 @@ export pgmout="OUTPUT.$$"
 
 export cycle=t${cyc}z 
 
-####################################
-# Determine Job Output Name on System
-####################################
-export pgmout="OUTPUT.$$"
-
 export SENDCOM=${SENDCOM:-YES}
 export SENDDBN=${SENDDBN:-YES}
 export SENDECF=${SENDECF:-YES}
@@ -42,7 +37,7 @@ export sigMODE=post # Only post-processing done here, but may need to be revised
 
 export HOMEwave=${HOMEwave_nfcens}
 export GEMwave=${GEMwave:-$HOMEwave/gempak}
-export FIXwave=${FIXwave:-HOMEwave/fix}
+export FIXwave=${FIXwave:-$HOMEwave/fix}
 
 # Run setpdy and initialize PDY variables
 sh setpdy.sh
@@ -79,7 +74,7 @@ export wavelog=${COMOUT}/wave.log
 
 ########################################################
 # Execute the script.
-/${HOMEwave}/scripts/exnawips_nfcens.sh
+${HOMEwave}/scripts/exnawips_nfcens.sh
 ########################################################
 
 export err=$?; err_chk
@@ -88,9 +83,8 @@ msg="JOB $job HAS COMPLETED NORMALLY."
 postmsg $jlogfile "$msg"
 
 if [ -e "$pgmout" ]; then
-	  cat $pgmout
-  fi
-
+  cat $pgmout
+fi
 
 if [ "$KEEPDATA" != "YES" ]; then
   cd $DATAROOT
