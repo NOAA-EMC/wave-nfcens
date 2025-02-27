@@ -1,0 +1,90 @@
+﻿NFCENS v1.3.2 RELEASE NOTES
+
+
+PRELUDE
+The NFCENS v1.3.1 is upgraded to NFCENS v1.3.2 with the following changes:
+* Implemented Executive Order 14172 to change Gulf name
+* Cleaned up typos and duplicate lines in a job script
+
+
+IMPLEMENTATION INSTRUCTIONS
+To clone the NFCENS software package:
+     cd $PACKAGEROOT
+     mkdir wave_nfcens.v1.3.2
+     cd wave_nfcens.v1.3.2
+     git clone --branch=v1.3.2 https://github.com/NOAA-EMC/wave-nfcens.git
+
+
+To build the NFCENS:
+     cd sorc
+     ./build_nfcens.lua.sh
+
+
+The build_nfcens.lua.sh script compiles all NFCENS executables. Compile log file (make_code_wave_nfcens.out) is in the sorc directory.
+
+
+PRE-IMPLEMENTATION TESTING REQUIREMENTS
+* Which production jobs should be tested as part of this implementation?
+   * jobs/JWAVE_NFCENS
+   * jobs/JWAVE_NFCENS_GEMPAK
+* Does this change require a 30-day evaluation?
+   * No
+
+
+TEST PLAN
+Test run the following two jobs:
+* jobs/JWAVE_NFCENS
+* jobs/JWAVE_NFCENS_GEMPAK
+
+
+Corresponding ecf scripts are located in the ecf directory. Output should be the same as the current production run.
+
+
+VERSION FILE CHANGES
+* None
+
+
+FIX CHANGES
+* Changed Gulf name in Line 114 of the fix/wave_mens.buoys file
+
+
+JOBS CHANGES
+* Cleaned up typos and duplicate lines in the jobs/JWAVE_NFCENS_GEMPAK file
+
+
+ECF/GEMPAK/PARM/SCRIPTS/SORC CHANGES
+* None
+
+
+CHANGES TO FILE NAMES
+* None
+
+
+CHANGES TO HPSS TARBALLS
+* None
+
+
+JOB DEPENDENCIES AND FLOW DIAGRAM
+* No changes
+
+
+TECHNICAL REQUIREMENTS
+* Runtime: no changes
+* Nodes: no changes
+* Tasks: no changes
+* Consumable Memory: no changes 
+* Shared vs. Exclusive: no changes
+* Serial vs. Parallel: no changes
+* Disk Storage: no changes
+
+
+DCOM DEPENDENCIES
+* All dcom data is data of opportunity. FNMOC ensemble data is currently missing at /lfs/h1/ops/prod/dcom/YYYYMMDD/wgrbbul/fnmoc_ocn_ens_0p5_gb2. No timeframe of when the OCN dataset will return to production.
+
+
+PREPARED BY
+L. Gwen Chen
+Verification, Post-Processing, and Product Generation Branch
+NOAA/NWS/NCEP/Environmental Modeling Center
+lichuan.chen@noaa.gov
+27 February 2025
